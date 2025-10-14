@@ -84,12 +84,33 @@ val wrf =
     .dependsOn(common)
 
 // Root project for convenience
+
+// The AROME pipeline
+val arome =
+  project.in(file("arome"))
+    .enablePlugins(JavaAppPackaging)
+    .settings(
+      name := "arome",
+      Universal / packageName := "soaringmeteo-arome",
+      run / fork := true,
+      javaOptions ++= Seq("-Xmx4g", "-Xms4g"),
+      Universal / javaOptions ++= javaOptions.value.map(opt => s"-J$opt"),
+      Compile / mainClass := Some("org.soaringmeteo.arome.Main"),
+      maintainer := "equipe@soaringmeteo.org",
+      libraryDependencies ++= Seq(
+        Dependencies.circeParser,
+        Dependencies.geotrellisRaster,
+        Dependencies.logback,
+      )
+    )
+    .dependsOn(common)
+
 val soaringmeteo =
   project.in(file("."))
     .settings(
       name := "soaringmeteo"
     )
-    .aggregate(common, gfs, wrf)
+    .aggregate(common, gfs, wrf, arome)
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -121,3 +142,4 @@ TaskKey[Unit]("makeWrfAssets") := Def.taskDyn {
   )
   (wrf / Compile / runMain).toTask(s" org.soaringmeteo.wrf.Main ${args.mkString(" ")}")
 }.value
+
