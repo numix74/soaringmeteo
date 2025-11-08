@@ -1,0 +1,20 @@
+package org.soaringmeteo
+
+import squants.energy.SpecificEnergy
+import squants.motion.Velocity
+import squants.thermal.Temperature
+import java.time.OffsetDateTime
+
+/**
+ * Unified interface for meteorological data from any source (GFS, AROME, etc.)
+ */
+trait MeteoData {
+  def thermalVelocity: Velocity
+  def boundaryLayerDepth: Double  // meters AGL
+  def wind10m: Wind
+  def windAtHeight(heightMeters: Int): Option[Wind]
+  def temperature2m: Temperature  // ✅ FIXED
+  def cape: Option[SpecificEnergy]  // ✅ FIXED
+  def totalCloudCover: Int  // 0-100
+  def time: OffsetDateTime
+}

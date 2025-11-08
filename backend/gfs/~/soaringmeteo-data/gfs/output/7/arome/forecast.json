@@ -1,0 +1,23 @@
+{
+  "zones": [{
+    "id": "pays-basque",
+    "label": "Pays Basque AROME 2.5km",
+    "raster": {
+      "proj": "EPSG:4326",
+      "resolution": 0.025,
+      "extent": [-2.0, 42.8, 0.5, 43.6]
+    },
+    "vectorTiles": {
+      "extent": [-222638, 5280000, 55658, 5372000],
+      "zoomLevels": 1,
+      "minZoom": 9,
+      "tileSize": 300
+    }
+  }],
+  "forecasts": [{
+    "path": "20251016_12",
+    "init": "2025-10-16T12:00:00Z",
+    "latest": 42,
+    "zones": ["pays-basque"]
+  }]
+}

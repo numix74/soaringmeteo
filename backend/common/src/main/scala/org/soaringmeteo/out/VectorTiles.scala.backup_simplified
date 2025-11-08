@@ -1,0 +1,100 @@
+package org.soaringmeteo.out
+
+import geotrellis.proj4.{LatLng, WebMercator}
+import geotrellis.vector.{Extent, Point => GeotrellisPoint, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon}
+import geotrellis.vector.reproject.Reproject
+import geotrellis.vectortile.{MVTFeature, StrictLayer, VectorTile, VInt64, VFloat}
+import org.slf4j.LoggerFactory
+import org.soaringmeteo.{Point, Wind, MeteoData}
+
+case class VectorTiles(path: String, feature: MeteoData => Wind, excluded: MeteoData => Boolean = _ => false)
+
+object VectorTiles {
+  private val logger = LoggerFactory.getLogger(getClass)
+
+  case class Parameters(
+    extent: Extent,
+    maxViewZoom: Int,
+    width: Int,
+    height: Int,
+    gridCoordinates: IndexedSeq[IndexedSeq[Point]]
+  ) {
+    val minViewZoom: Int = 0
+    val zoomLevels: Int = maxViewZoom + 1
+  }
+
+  def writeAllVectorTiles(
+    parameters: Parameters,
+    targetDir: os.Path,
+    hourOffset: Int,
+    meteoData: IndexedSeq[IndexedSeq[MeteoData]]
+  ): Unit = {
+    logger.debug(s"Generating vector tiles for hour offset n°${hourOffset}")
+    for (vectorTile <- gfsVectorTiles) {
+      val fileName = s"${hourOffset}.mvt"
+      val path = targetDir / vectorTile.path / fileName
+      logger.trace(s"Generating MVT ${path}")
+      val encoded = vectorTile.toMvt(parameters, meteoData)
+      os.write.over(path, encoded, createFolders = true)
+    }
+  }
+
+  def apply(path: String, feature: MeteoData => Wind): VectorTiles =
+    VectorTiles(path, feature, _ => false)
+
+  val gfsVectorTiles: List[VectorTiles] = List(
+    VectorTiles("wind-surface", _.surfaceWind),
+    VectorTiles("wind-boundary-layer", _.boundaryLayerWind),
+    VectorTiles("wind-soaring-layer-top", _.windSoaringLayerTop),
+    VectorTiles("wind-300m-agl", _.wind300mAGL),
+    VectorTiles("wind-2000m-amsl", _.wind2000mAMSL),
+    VectorTiles("wind-3000m-amsl", _.wind3000mAMSL),
+    VectorTiles("wind-4000m-amsl", _.wind4000mAMSL)
+  )
+
+  implicit class VectorTilesOps(vectorTile: VectorTiles) {
+    def toMvt(parameters: Parameters, meteoData: IndexedSeq[IndexedSeq[MeteoData]]): Array[Byte] = {
+      val features = scala.collection.mutable.ListBuffer[MVTFeature[GeotrellisPoint]]()
+
+      for {
+        x <- 0 until parameters.width
+        y <- 0 until parameters.height
+        if !vectorTile.excluded(meteoData(x)(y))
+      } {
+        val data = meteoData(x)(y)
+        val wind = vectorTile.feature(data)
+        val point = parameters.gridCoordinates(x)(y)
+        val geoPoint = GeotrellisPoint(point.longitude.toDouble, point.latitude.toDouble)
+        val reprojected = Reproject(geoPoint, LatLng, WebMercator)
+
+        features += MVTFeature(
+          geom = reprojected,
+          data = Map(
+            "u" -> VFloat(wind.u.toMetersPerSecond.toFloat),
+            "v" -> VFloat(wind.v.toMetersPerSecond.toFloat)
+          )
+        )
+      }
+
+      val layer = StrictLayer(
+        name = "features",
+        tileWidth = 4096,
+        version = 2,
+        tileExtent = parameters.extent,
+        points = features.toSeq,
+        multiPoints = Seq.empty[MVTFeature[MultiPoint]],
+        lines = Seq.empty[MVTFeature[LineString]],
+        multiLines = Seq.empty[MVTFeature[MultiLineString]],
+        polygons = Seq.empty[MVTFeature[Polygon]],
+        multiPolygons = Seq.empty[MVTFeature[MultiPolygon]]
+      )
+
+      val vt = VectorTile(
+        layers = Map("features" -> layer),
+        tileExtent = parameters.extent
+      )
+
+      vt.toBytes
+    }
+  }
+}

@@ -9,7 +9,7 @@ import { styleSheet } from "./css-hooks";
 import {LayerKeys} from "./LayerKeys";
 import {HelpButton} from './help/HelpButton';
 import {Localized} from "./i18n";
-import {fetchGfsForecastRuns, fetchWrfForecastRuns} from "./data/ForecastMetadata";
+import {fetchGfsForecastRuns, fetchWrfForecastRuns, fetchAromeForecastRuns} from "./data/ForecastMetadata";
 import {LocationDetails, SoundingDiagram} from "./LocationDetails";
 import {diagramsIndex} from "./styles/Styles";
 
@@ -163,13 +163,14 @@ const Loader = ((props: {
   const owner = getOwner(); // Remember the tracking scope because it is lost when the promise callback is called
   const [loadedDomain] = createResource(() =>
       Promise
-          .all([
+	  .all([
             fetchGfsForecastRuns(),
-            fetchWrfForecastRuns()
+            fetchWrfForecastRuns(),
+            fetchAromeForecastRuns()
           ])
-          .then(([[gfsRuns, gfsZones], [wrfRuns, wrfZones]]) => {
-            return runWithOwner(owner, () => new Domain(gfsRuns, gfsZones, wrfRuns, wrfZones, props.mapHooks));
-          })
+          .then(([[gfsRuns, gfsZones], [wrfRuns, wrfZones], [aromeRuns, aromeZones]]) => {
+            return runWithOwner(owner, () => new Domain(gfsRuns, gfsZones, wrfRuns, wrfZones, aromeRuns, aromeZones, props.mapHooks));
+           })
           .catch(error => {
             console.log(error);
             alert('Unable to retrieve forecast data. Try again later or contact equipe@soaringmeteo.org if the problem persists.');

@@ -1,0 +1,15 @@
+include "reference"
+
+soargfs {
+  forecast_length = 5
+  forecast_history = 2
+  download_rate_limit = 100
+  subgrids = [
+    {
+      id = "pyrenees"
+      extent = ["-4.0", "41.25", "3.75", "44.25"]
+      label = "Pyrénées"
+      vectorTileSize = 300
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+package org.soaringmeteo.arome
+
+import org.slf4j.LoggerFactory
+import org.soaringmeteo.Point
+import org.soaringmeteo.grib.Grib
+import ucar.ma2.{Array => UArray, ArrayFloat}
+import ucar.nc2.dt.grid.GeoGrid
+
+case class AromeZone(
+  longitudes: IndexedSeq[Double],
+  latitudes: IndexedSeq[Double]
+)
+
+object AromeZone {
+  val paysBasque = AromeZone(
+    longitudes = BigDecimal(-2.0).to(BigDecimal(0.5), BigDecimal(0.025)).map(_.toDouble).toIndexedSeq,
+    latitudes = BigDecimal(42.8).to(BigDecimal(43.6), BigDecimal(0.025)).map(_.toDouble).toIndexedSeq
+  )
+}
+
+case class LoadedData(
+  data: UArray,
+  grid: GeoGrid,
+  name: String,
+  isFlux: Boolean = false
+) {
+  private val logger = LoggerFactory.getLogger(getClass)
+  private val shape = data.getShape
+  private val rank = data.getRank
+  logger.info(s"$name shape: ${shape.mkString("x")} (rank=$rank)")
+  
+  def readAtTime(location: Point, hourOffset: Int): Double = {
+    if (isFlux && hourOffset == 0) {
+      return 0.0
+    }
+    
+    val adjustedTimeIdx = if (isFlux) hourOffset - 1 else hourOffset
+    
+    val Array(x, y) = grid.getCoordinateSystem.findXYindexFromLatLon(
+      location.latitude.doubleValue,
+      location.longitude.doubleValue,
+      null
+    )
+    
+    (rank, data) match {
+      case (4, d4: ArrayFloat.D4) => d4.get(adjustedTimeIdx, 0, y, x).toDouble
+      case (3, d3: ArrayFloat.D3) => d3.get(adjustedTimeIdx, y, x).toDouble
+      case _ => throw new Exception(s"Unsupported: rank=$rank, class=${data.getClass}")
+    }
+  }
+}
+
+object AromeGrib {
+  
+  private val logger = LoggerFactory.getLogger(getClass)
+  
+  def fromGroupFiles(
+    sp1File: os.Path,
+    sp2File: os.Path,
+    sp3File: os.Path,
+    hourOffset: Int,
+    zone: AromeZone
+  ): IndexedSeq[IndexedSeq[AromeData]] = {
+    
+    logger.info(s"Lecture AROME heure $hourOffset depuis ${sp1File.last}")
+    
+    val sp1Data = Grib.bracket(sp1File) { grib =>
+      val t2m = grib.Feature("Temperature_height_above_ground")
+      val u10 = grib.Feature("u-component_of_wind_height_above_ground")
+      val v10 = grib.Feature("v-component_of_wind_height_above_ground")
+      
+      (
+        LoadedData(t2m.grid.readDataSlice(-1, -1, -1, -1), t2m.grid, "T2M"),
+        LoadedData(u10.grid.readDataSlice(-1, -1, -1, -1), u10.grid, "U10"),
+        LoadedData(v10.grid.readDataSlice(-1, -1, -1, -1), v10.grid, "V10")
+      )
+    }
+    
+    val sp2Data = Grib.bracket(sp2File) { grib =>
+      val cape = grib.Feature("Convective_available_potential_energy_surface_layer")
+      val pblh = grib.Feature("Planetary_boundary_layer_height_surface")
+      val clouds = grib.Feature.maybe("Low_cloud_cover_surface")
+      
+      (
+        LoadedData(cape.grid.readDataSlice(-1, -1, -1, -1), cape.grid, "CAPE"),
+        LoadedData(pblh.grid.readDataSlice(-1, -1, -1, -1), pblh.grid, "PBLH"),
+        clouds.map { c => LoadedData(c.grid.readDataSlice(-1, -1, -1, -1), c.grid, "CLOUDS", isFlux = true) }
+      )
+    }
+    
+    val sp3Data = Grib.bracket(sp3File) { grib =>
+      val sensible = grib.Feature("Sensible_heat_net_flux_surface_Mixed_intervals_Accumulation")
+      val latent = grib.Feature("Latent_heat_net_flux_surface_Mixed_intervals_Accumulation")
+      val solar = grib.Feature("Net_short_wave_radiation_flux_surface_Mixed_intervals_Accumulation")
+      
+      (
+        LoadedData(sensible.grid.readDataSlice(-1, -1, -1, -1), sensible.grid, "SHTFL", isFlux = true),
+        LoadedData(latent.grid.readDataSlice(-1, -1, -1, -1), latent.grid, "LHTFL", isFlux = true),
+        LoadedData(solar.grid.readDataSlice(-1, -1, -1, -1), solar.grid, "SOLAR", isFlux = true)
+      )
+    }
+    
+    logger.info(s"Extraction ${zone.longitudes.size}x${zone.latitudes.size} points...")
+    
+    for (lon <- zone.longitudes) yield {
+      for (lat <- zone.latitudes) yield {
+        val location = Point(lat, lon)
+        AromeData(
+          t2m = sp1Data._1.readAtTime(location, hourOffset),
+          u10 = sp1Data._2.readAtTime(location, hourOffset),
+          v10 = sp1Data._3.readAtTime(location, hourOffset),
+          pblh = sp2Data._2.readAtTime(location, hourOffset),
+          cape = sp2Data._1.readAtTime(location, hourOffset),
+          sensibleHeatFlux = sp3Data._1.readAtTime(location, hourOffset),
+          latentHeatFlux = sp3Data._2.readAtTime(location, hourOffset),
+          solarRadiation = sp3Data._3.readAtTime(location, hourOffset),
+          cloudCover = sp2Data._3.map(_.readAtTime(location, hourOffset)).getOrElse(0.0)
+        )
+      }
+    }
+  }
+}
