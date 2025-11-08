@@ -20,7 +20,7 @@ import {showDate} from './shared';
 import {Checkbox, Radio, Select} from './styles/Forms';
 import {burgerBorderTopStyle, burgerPaddingStyle} from "./styles/Styles";
 import {useI18n} from "./i18n";
-import {gfsName, ModelName, wrfName, Zone} from "./data/Model";
+import {aromeName, gfsName, ModelName, wrfName, Zone} from "./data/Model";
 
 /**
  * Overlay on the map that displays the soaring forecast.
@@ -42,7 +42,8 @@ export const LayersSelector = (props: {
         {
           new Array<[string, () => string, ModelName]>(
             ['soarGFS (25 km)', () => m().menuGFSLegend(), gfsName],
-            ['soarWRF (2-6 km)', () => m().menuWRFLegend(), wrfName]
+            ['soarWRF (2-6 km)', () => m().menuWRFLegend(), wrfName],
+            ['AROME Pays Basque (2.5 km)', () => 'Météo-France AROME 2.5km', aromeName]
           )
             .map(([label, title, modelName]) =>
               <Radio
@@ -76,6 +77,27 @@ export const LayersSelector = (props: {
           />
         </fieldset>
       </Show>
+      <Show when={ props.domain.state.model.name === aromeName }>
+	<fieldset style={ fieldsetPaddingStyle }>
+          <legend>{ m().menuInitializationTime() }</legend>
+	  <Select
+            title="Heure du run AROME"
+            options={
+              props.domain.aromeRuns.map(aromeRun => {
+                const initTimeString =
+                  showDate(
+                    aromeRun.init,
+                    { showWeekDay: true, timeZone: props.domain.timeZone() }
+                  );
+                return [initTimeString, aromeRun]
+             })
+           }
+           selectedOption={ props.domain.state.forecastMetadata }
+           onChange={ forecastMetadata => props.domain.setForecastMetadata(forecastMetadata) }
+           key={ forecastMetadata => forecastMetadata.runPath }
+         />
+       </fieldset>
+     </Show> 
       <fieldset style={ fieldsetPaddingStyle }>
         <legend>{ m().menuZone() }</legend>
         {

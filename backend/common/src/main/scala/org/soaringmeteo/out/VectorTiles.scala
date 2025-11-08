@@ -5,11 +5,11 @@ import geotrellis.vector.{ Extent, Point => GeotrellisPoint }
 import geotrellis.vector.reproject.Reproject
 import geotrellis.vectortile.{MVTFeature, MVTFeatures, StrictLayer, VectorTile, VInt64, VFloat}
 import org.slf4j.LoggerFactory
-import org.soaringmeteo.{Forecast, Point, Wind}
+import org.soaringmeteo.{MeteoData, Point, Wind}
 import squants.Meters
 
 /** Output of the model encoded as vector tiles */
-case class VectorTiles(path: String, feature: Forecast => Wind, excluded: Forecast => Boolean = _ => false)
+case class VectorTiles(path: String, feature: MeteoData => Wind, excluded: MeteoData => Boolean = _ => false)
 
 object VectorTiles {
 
@@ -36,10 +36,10 @@ object VectorTiles {
       // just one tile that covers the whole extent. At zoom level 1, there are 4 tiles, at
       // zoom level 2 there are 16 tiles, and so on.
       // By default, OpenLayers assumes that 1 tile covers an area of 512 px on the map. So, if the
-      // projection of the extent is larger than 512 px, OpenLayers will try to “zoom” into the tiles
+      // projection of the extent is larger than 512 px, OpenLayers will try to "zoom" into the tiles
       // to find only the points that are visible in the current view.
       // We find that rendering at most 15 wind arrow per tile looks good, so we make sure that
-      // our tiles don’t contain more points than that. We down-sample the grid by removing every
+      // our tiles don't contain more points than that. We down-sample the grid by removing every
       // other point from the previous zoom level.
       val threshold = 15
       var zoomLevelsValue = 1
@@ -48,6 +48,7 @@ object VectorTiles {
         maxPoints = maxPoints / 2
         zoomLevelsValue = zoomLevelsValue + 1
       }
+      if (maxPoints < 1) maxPoints = 1 
       // The minimal zoom level of the tiles is always 0, but here we define the minimal
       // zoom level of the view. It means that there is no point in trying to show the
       // wind arrows when the view zoom level is below that value, because the information
@@ -58,14 +59,14 @@ object VectorTiles {
 
   }
 
-  val allVectorTiles = List(
+  val gfsVectorTiles = List(
     VectorTiles("wind-surface", _.surfaceWind),
     VectorTiles("wind-boundary-layer", _.boundaryLayerWind),
-    VectorTiles("wind-soaring-layer-top", _.winds.soaringLayerTop),
-    VectorTiles("wind-300m-agl", _.winds.`300m AGL`),
-    VectorTiles("wind-2000m-amsl", _.winds.`2000m AMSL`, excluded = _.elevation > Meters(2000)),
-    VectorTiles("wind-3000m-amsl", _.winds.`3000m AMSL`, excluded = _.elevation > Meters(3000)),
-    VectorTiles("wind-4000m-amsl", _.winds.`4000m AMSL`, excluded = _.elevation > Meters(4000))
+    VectorTiles("wind-soaring-layer-top", _.windSoaringLayerTop),
+    VectorTiles("wind-300m-agl", _.wind300mAGL),
+    VectorTiles("wind-2000m-amsl", _.wind2000mAMSL),
+    VectorTiles("wind-3000m-amsl", _.wind3000mAMSL),
+    VectorTiles("wind-4000m-amsl", _.wind4000mAMSL)
   )
 
   // Cache the projection of the coordinates from LatLng to WebMercator
@@ -76,7 +77,7 @@ object VectorTiles {
     vectorTiles: VectorTiles,
     targetDir: os.Path,
     parameters: Parameters,
-    forecasts: IndexedSeq[IndexedSeq[Forecast]]
+    meteoData: IndexedSeq[IndexedSeq[MeteoData]]
   ): Unit = {
     val rootTileExtent = parameters.extent
     val zoomLevels = parameters.zoomLevels
@@ -105,7 +106,7 @@ object VectorTiles {
           Reproject((lonLatPoint.longitude.doubleValue, lonLatPoint.latitude.doubleValue), LatLng, WebMercator)
             .ensuring(p => rootTileExtent.contains(p._1, p._2), "Features must be within the root tile extent")
         )
-        (webMercatorPoint, forecasts(x)(y))
+        (webMercatorPoint, meteoData(x)(y))
       }
 
       val tiles =
@@ -115,21 +116,37 @@ object VectorTiles {
             // Compute the (x, y) tile coordinates this point belongs too
             val x = ((webMercatorX - rootTileExtent.xmin) / tileSize).intValue
             val y = ((rootTileExtent.ymax - webMercatorY) / tileSize).intValue
-            assert(x < tilesCount, s"Bad x value: ${x}. ${parameters.gridCoordinates(x)(y)}.")
-            assert(y < tilesCount, s"Bad y value: ${y}. ${parameters.gridCoordinates(x)(y)}.")
+            assert(x < tilesCount, s"Bad x value: ${x}.")
+            assert(y < tilesCount, s"Bad y value: ${y}.")
             (x, y)
           }
 
       logger.trace(s"Found points in tiles ${tiles.keys.toSeq.sorted.mkString(",")}")
 
       for (((x, y), features) <- tiles) {
+        var usedFeatures = features
+
+        // SI LA LISTE EST VIDE : ON FORCE UN POINT MÉTÉO CENTRAL POUR LA TUILE
+        if (usedFeatures.isEmpty) {
+          // Coordonnées centrales (en indices de la grille)
+          val centralLonIdx = (parameters.width / 2).min(parameters.width - 1)
+          val centralLatIdx = (parameters.height / 2).min(parameters.height - 1)
+          val lonLatPoint = parameters.gridCoordinates(centralLonIdx)(centralLatIdx)
+          val webMercatorPoint = coordinatesCache.getOrElseUpdate(
+            lonLatPoint,
+            Reproject((lonLatPoint.longitude.doubleValue, lonLatPoint.latitude.doubleValue), LatLng, WebMercator)
+          )
+          // Prend la donnée météo centrale
+          val data = meteoData(centralLonIdx)(centralLatIdx)
+          usedFeatures = IndexedSeq((webMercatorPoint, data))
+        }
+
         val tileExtent = Extent(
           rootTileExtent.xmin + x * tileSize,
           rootTileExtent.ymax - (y + 1) * tileSize,
           rootTileExtent.xmin + (x + 1) * tileSize,
           rootTileExtent.ymax - y * tileSize,
         )
-//        assert(features.forall { case ((pointX, pointY), _) => tileExtent.contains(pointX, pointY) })
         val vectorTile = VectorTile(
           layers = Map(
             "points" -> StrictLayer(
@@ -139,10 +156,10 @@ object VectorTiles {
               tileExtent = tileExtent,
               mvtFeatures = MVTFeatures(
                 points = features
-                  .filterNot { case (_, forecast) => vectorTiles.excluded(forecast) }
-                  .map { case (point @ (webMercatorX, webMercatorY), forecast) =>
+                  .filterNot { case (_, data) => vectorTiles.excluded(data) }
+                  .map { case (point @ (webMercatorX, webMercatorY), data) =>
                   featuresCache.getOrElseUpdate(point, {
-                    val wind = vectorTiles.feature(forecast)
+                    val wind = vectorTiles.feature(data)
                     MVTFeature(
                       geom = GeotrellisPoint(webMercatorX, webMercatorY),
                       data = Map(
@@ -175,17 +192,17 @@ object VectorTiles {
     parameters: Parameters,
     subgridTargetDir: os.Path,
     hourOffset: Int,
-    forecasts: IndexedSeq[IndexedSeq[Forecast]]
+    meteoData: IndexedSeq[IndexedSeq[MeteoData]]
   ): Unit = {
     logger.debug(s"Generating vector tiles for hour offset n°${hourOffset}")
 
-    for (vectorTiles <- allVectorTiles) {
+    for (vectorTiles <- gfsVectorTiles) {
       logger.trace(s"Generating vector tiles for layer ${vectorTiles.path}")
       writeVectorTiles(
         vectorTiles,
         subgridTargetDir / vectorTiles.path / s"${hourOffset}",
         parameters,
-        forecasts
+        meteoData
       )
     }
   }

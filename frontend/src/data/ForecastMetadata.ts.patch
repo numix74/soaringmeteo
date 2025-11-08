@@ -1,0 +1,4 @@
+export const fetchAromeForecastRuns = async (): Promise<[Array<ForecastMetadata>, Array<Zone>]> => {
+  // Temporairement désactivé - utiliser arome.html pour AROME
+  return [[], []];
+};

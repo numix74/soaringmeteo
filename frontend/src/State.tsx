@@ -7,7 +7,7 @@ import { boundaryLayerWindLayer } from './layers/Wind';
 import {Accessor, batch, createMemo, mergeProps, splitProps} from 'solid-js';
 import {DetailedView, DetailedViewType} from "./DetailedView";
 import {Plausible} from "./Plausible";
-import { gfsName, Model, ModelName, wrfName, Zone } from "./data/Model";
+import { aromeName, gfsName, Model, ModelName, wrfName, Zone } from "./data/Model";
 import {MapHooks} from "./map/Map";
 import {useI18n, Messages} from "./i18n";
 
@@ -91,13 +91,13 @@ const loadModelName = (): ModelName => {
   // First, try to read from the URL parameters
   const params = new URLSearchParams(window.location.search);
   const model = params.get('model');
-  if (model === gfsName || model === wrfName) {
+  if (model === gfsName || model === wrfName || model === aromeName) {
     return model
   }
   // Second, read from local storage
   return loadStoredState(
     modelKey,
-    value => value === wrfName ? wrfName : gfsName,
+    value => value === wrfName ? wrfName : value === aromeName ? aromeName : gfsName,
     gfsName
   );
 };
@@ -175,6 +175,7 @@ export class Domain {
   private readonly plausible: Plausible;
   private readonly gfsModel: Model;
   private readonly wrfModel: Model;
+  private readonly aromeModel: Model;
   private readonly m: Accessor<Messages>;
 
   // Since those reactive components depend on the state, we can not make them part of the state
@@ -186,6 +187,8 @@ export class Domain {
     gfsZones: Array<Zone>,
     readonly wrfRuns: Array<ForecastMetadata>,
     wrfZones: Array<Zone>,
+    readonly aromeRuns: Array<ForecastMetadata>,
+    aromeZones: Array<Zone>,
     private readonly mapHooks: MapHooks,
   ) {
     this.plausible = new Plausible();
@@ -199,8 +202,13 @@ export class Domain {
       zones: wrfZones,
       timeStep: 1
     };
+    this.aromeModel = {
+      name: aromeName,
+      zones: aromeZones,
+      timeStep: 1
+    };
     const modelName = loadModelName();
-    const forecastMetadata = selectRun(modelName, gfsRuns, wrfRuns);
+    const forecastMetadata = selectRun(modelName, gfsRuns, wrfRuns, aromeRuns);
     const selectedZone = loadZone(modelName, forecastMetadata.availableZones);
     const primaryLayer = loadPrimaryLayer();
     const primaryLayerEnabled = loadPrimaryLayerEnabled();
@@ -212,7 +220,7 @@ export class Domain {
   
     // FIXME handle map location and zoom here? (currently handled in /map/Map.ts)
     const [get, set] = createStore<State>({
-      model: modelName === wrfName ? this.wrfModel : this.gfsModel,
+      model: modelName === wrfName ? this.wrfModel : modelName === aromeName ? this.aromeModel : this.gfsModel,
       forecastMetadata: forecastMetadata,
       selectedZone,
       primaryLayer: primaryLayer,
@@ -252,13 +260,13 @@ export class Domain {
 
   /** Set the model (GFS, WRF) to display */
   setModel(modelName: ModelName): void {
-    const run = selectRun(modelName, this.gfsRuns, this.wrfRuns);
+    const run = selectRun(modelName, this.gfsRuns, this.wrfRuns, this.aromeRuns);
     const selectedZone = loadZone(modelName, run.availableZones);
     saveModelName(modelName);
     this.plausible.trackPageView(modelName);
     saveZone(modelName, selectedZone.id);
     batch(() => {
-      this.setState({ model: modelName === wrfName ? this.wrfModel : this.gfsModel, selectedZone });
+      this.setState({ model: modelName === wrfName ? this.wrfModel : modelName === aromeName ? this.aromeModel : this.gfsModel, selectedZone });
       this.setForecastMetadata(run);
     });
   }
@@ -477,7 +485,8 @@ const selectWrfRun = (runs: Array<ForecastMetadata>): ForecastMetadata => {
 };
 
 /** Select the default forecast run to display */
-const selectRun = (name: ModelName, gfsRuns: Array<ForecastMetadata>, wrfRuns: Array<ForecastMetadata>): ForecastMetadata => {
+const selectRun = (name: ModelName, gfsRuns: Array<ForecastMetadata>, wrfRuns: Array<ForecastMetadata>, aromeRuns: Array<ForecastMetadata>): ForecastMetadata => {
   if (name === gfsName) return gfsRuns[gfsRuns.length - 1]
+  else if (name === aromeName) return aromeRuns[aromeRuns.length - 1]
   else return selectWrfRun(wrfRuns)
 }

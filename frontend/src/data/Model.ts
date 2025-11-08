@@ -1,4 +1,3 @@
-
 export type Zone = {
   readonly id: string
   readonly raster: {
@@ -13,8 +12,7 @@ export type Zone = {
     readonly tileSize: number
   }
 }
-
-/** Numerical Weather Prediction Model (e.g. GFS, WRF) */
+/** Numerical Weather Prediction Model (e.g. GFS, WRF, AROME) */
 export type Model = {
   name: ModelName
   /** All the possible zones covered by the model */
@@ -22,7 +20,7 @@ export type Model = {
   /** Number of hours between two forecast time-steps */
   timeStep: number
 }
-
-export type ModelName = 'gfs' | 'wrf';
+export type ModelName = 'gfs' | 'wrf' | 'arome';
 export const gfsName: ModelName = 'gfs';
 export const wrfName: ModelName = 'wrf';
+export const aromeName: ModelName = 'arome';

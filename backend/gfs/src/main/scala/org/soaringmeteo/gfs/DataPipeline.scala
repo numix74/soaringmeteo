@@ -2,7 +2,7 @@ package org.soaringmeteo.gfs
 
 import java.util.concurrent.Executors
 import org.slf4j.LoggerFactory
-import org.soaringmeteo.Forecast
+import org.soaringmeteo.{Forecast, GfsMeteoDataAdapter}
 import org.soaringmeteo.gfs.in.GfsGrib
 import org.soaringmeteo.gfs.out.{Store, subgridTargetPath}
 import org.soaringmeteo.out.{Raster, VectorTiles}
@@ -104,12 +104,19 @@ object DataPipeline {
 
     def generateSubgridResults(subgrid: Subgrid, hourOffset: Int, forecasts: IndexedSeq[IndexedSeq[Forecast]]): Future[Unit] = {
       Future {
+        // Adapter Forecast → MeteoData
+        val meteoDataGrid = forecasts.map { row =>
+          row.map { forecast =>
+            new GfsMeteoDataAdapter(forecast)
+          }
+        }
+        
         // We create one PNG file per forecast time and per output variable (e.g., `2021-01-08T12/europe-africa/soaring-layer-depth/0.png`,
         // `2021-01-08T12/america/wind-300m-agl/3.png`, etc.).
         // Each file contains the forecast for that parameter (soaring layer depth, wind, etc.) within the subgrid
         val subgridTargetDir = subgridTargetPath(runTargetDir, subgrid)
-        Raster.writeAllPngFiles(subgrid.width, subgrid.height, subgridTargetDir, hourOffset, forecasts)
-        VectorTiles.writeAllVectorTiles(subgrid.vectorTilesParameters, subgridTargetDir, hourOffset, forecasts)
+        Raster.writeAllPngFiles(subgrid.width, subgrid.height, subgridTargetDir, hourOffset, meteoDataGrid)
+        VectorTiles.writeAllVectorTiles(subgrid.vectorTilesParameters, subgridTargetDir, hourOffset, meteoDataGrid)
       }(generatingSubgridResults)
     }.tap(_.foreach(_ => subgridResultsReporter.notifyCompleted())(ExecutionContext.global))
 

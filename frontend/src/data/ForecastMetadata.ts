@@ -163,3 +163,8 @@ export const wrfForecastOffsets = (wrfRun: ForecastMetadata): Array<[number, Dat
     return [i, date]
   });
 };
+
+
+
+export const fetchAromeForecastRuns = async (): Promise<[Array<ForecastMetadata>, Array<Zone>]> =>
+  fetchForecastRuns('arome');

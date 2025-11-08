@@ -22,7 +22,7 @@ val common =
         Dependencies.geotrellisRaster,
         Dependencies.geotrellisVectorTile,
         // grib2 and NetCDF files manipulation
-        "edu.ucar" % "grib" % "5.5.3",
+        "edu.ucar" % "grib" % "5.8.0",
         // Quantities
         Dependencies.squants,
         // Testing
@@ -83,8 +83,6 @@ val wrf =
     )
     .dependsOn(common)
 
-// Root project for convenience
-
 // The AROME pipeline
 val arome =
   project.in(file("arome"))
@@ -98,9 +96,19 @@ val arome =
       Compile / mainClass := Some("org.soaringmeteo.arome.Main"),
       maintainer := "equipe@soaringmeteo.org",
       libraryDependencies ++= Seq(
-        Dependencies.circeParser,
-        Dependencies.geotrellisRaster,
+        // Logging
         Dependencies.logback,
+        // Persistence
+        "com.typesafe.slick" %% "slick" % "3.4.1",
+        "com.h2database" % "h2" % "2.2.224",
+        // JSON
+        Dependencies.circeParser,
+        // Configuration
+        Dependencies.config,
+        // Image generation
+        Dependencies.geotrellisRaster,
+        // Testing
+        Dependencies.verify % Test,
       )
     )
     .dependsOn(common)
@@ -142,4 +150,3 @@ TaskKey[Unit]("makeWrfAssets") := Def.taskDyn {
   )
   (wrf / Compile / runMain).toTask(s" org.soaringmeteo.wrf.Main ${args.mkString(" ")}")
 }.value
-
