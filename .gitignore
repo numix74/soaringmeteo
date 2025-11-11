@@ -1,0 +1,55 @@
+# Données générées et sorties météo (cartes, tuiles, données brutes)
+backend/gfs/**/soaringmeteo-data/
+backend/gfs/**/output/
+backend/**/output/
+tiles/
+*.mbtiles
+*.mvt
+
+# Logs et fichiers temporaires
+backend/logs/
+*.log
+*.tmp
+tmp/
+.cache/
+
+# Images / tuiles / caches d'images
+*.png
+*.jpg
+*.jpeg
+*.tif
+*.tiff
+*.webp
+
+# Fichiers météo / grib / netcdf / gros données
+*.grib
+*.grb
+*.grb2
+*.nc
+*.nc4
+
+# Sérialisations / gros binaires
+*.pickle
+*.pkl
+*.sqlite
+*.db
+*.tar
+*.tar.gz
+*.zip
+*.7z
+
+# Environnements & dépendances
+venv/
+.env/
+node_modules/
+
+# Fichiers IDE / OS
+.DS_Store
+Thumbs.db
+
+# Exclure les fichiers de sauvegarde locaux nommés ~
+*~
+
+# garder ces images logos même si *.png est ignoré
+!images/soaringmeteo.png
+!images/i18n-pr-2.png
