@@ -96,14 +96,14 @@ object AromeGrib {
     }
 
     val sp3Data = Grib.bracket(sp3File) { grib =>
-      val sensible = grib.Feature("Sensible_heat_net_flux_surface_Mixed_intervals_Accumulation")
-      val latent = grib.Feature("Latent_heat_net_flux_surface_Mixed_intervals_Accumulation")
-      val solar = grib.Feature("Net_short_wave_radiation_flux_surface_Mixed_intervals_Accumulation")
+      val sensible = grib.Feature.maybe("Sensible_heat_net_flux_surface_Mixed_intervals_Accumulation")
+      val latent = grib.Feature.maybe("Latent_heat_net_flux_surface_Mixed_intervals_Accumulation")
+      val solar = grib.Feature.maybe("Net_short_wave_radiation_flux_surface_Mixed_intervals_Accumulation")
 
       (
-        LoadedData(sensible.grid.readDataSlice(-1, -1, -1, -1), sensible.grid, "SHTFL", isFlux = true),
-        LoadedData(latent.grid.readDataSlice(-1, -1, -1, -1), latent.grid, "LHTFL", isFlux = true),
-        LoadedData(solar.grid.readDataSlice(-1, -1, -1, -1), solar.grid, "SOLAR", isFlux = true)
+        sensible.map(s => LoadedData(s.grid.readDataSlice(-1, -1, -1, -1), s.grid, "SHTFL", isFlux = true)),
+        latent.map(l => LoadedData(l.grid.readDataSlice(-1, -1, -1, -1), l.grid, "LHTFL", isFlux = true)),
+        solar.map(s => LoadedData(s.grid.readDataSlice(-1, -1, -1, -1), s.grid, "SOLAR", isFlux = true))
       )
     }
 
@@ -121,9 +121,9 @@ object AromeGrib {
           v10 = sp1Data._3.readAtTime(location, hourOffset),
           pblh = sp2Data._2.map(_.readAtTime(location, hourOffset)).getOrElse(0.0),
           cape = sp2Data._1.map(_.readAtTime(location, hourOffset)).getOrElse(0.0),
-          sensibleHeatFlux = sp3Data._1.readAtTime(location, hourOffset),
-          latentHeatFlux = sp3Data._2.readAtTime(location, hourOffset),
-          solarRadiation = sp3Data._3.readAtTime(location, hourOffset),
+          sensibleHeatFlux = sp3Data._1.map(_.readAtTime(location, hourOffset)).getOrElse(0.0),
+          latentHeatFlux = sp3Data._2.map(_.readAtTime(location, hourOffset)).getOrElse(0.0),
+          solarRadiation = sp3Data._3.map(_.readAtTime(location, hourOffset)).getOrElse(0.0),
           cloudCover = sp2Data._3.map(_.readAtTime(location, hourOffset)).getOrElse(0.0),
           terrainElevation = terrainElev,
           windsAtHeights = extractWindsAtHeights(windsDir, location, hourOffset)
