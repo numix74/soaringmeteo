@@ -31,11 +31,10 @@ case class LoadedData(
   logger.info(s"$name shape: ${shape.mkString("x")} (rank=$rank)")
 
   def readAtTime(location: Point, hourOffset: Int): Double = {
+    // Special case: flux variables at hour 0 return 0
     if (isFlux && hourOffset == 0) {
       return 0.0
     }
-
-    val adjustedTimeIdx = if (isFlux) hourOffset - 1 else hourOffset
 
     val Array(x, y) = grid.getCoordinateSystem.findXYindexFromLatLon(
       location.latitude.doubleValue,
@@ -43,10 +42,30 @@ case class LoadedData(
       null
     )
 
+    // Since we now read single timesteps, data should be 2D
     (rank, data) match {
-      case (4, d4: ArrayFloat.D4) => d4.get(adjustedTimeIdx, 0, y, x).toDouble
-      case (3, d3: ArrayFloat.D3) => d3.get(adjustedTimeIdx, y, x).toDouble
-      case _ => throw new Exception(s"Unsupported: rank=$rank, class=${data.getClass}")
+
+      case (2, d2: ArrayFloat.D2) =>
+        // Check bounds before accessing
+        val Array(dimY, dimX) = shape
+
+        if (y < 0 || y >= dimY) {
+          logger.error(s"$name: Y index $y out of bounds [0, $dimY) at location $location")
+          logger.error(s"$name: Grid dimensions: ${dimY}x$dimX")
+          throw new ArrayIndexOutOfBoundsException(s"Y index $y out of bounds for dimension $dimY")
+        }
+
+        if (x < 0 || x >= dimX) {
+          logger.error(s"$name: X index $x out of bounds [0, $dimX) at location $location")
+          logger.error(s"$name: Grid dimensions: ${dimY}x$dimX")
+          throw new ArrayIndexOutOfBoundsException(s"X index $x out of bounds for dimension $dimX")
+        }
+        d2.get(y, x).toDouble
+
+      case _ =>
+        logger.error(s"$name: Unexpected array rank $rank, expected 2")
+        logger.error(s"$name: Array shape: ${shape.mkString("x")}")
+        throw new Exception(s"Unexpected array structure: rank=$rank, expected 2D array. Shape: ${shape.mkString("x")}")
     }
   }
 }
@@ -74,10 +93,11 @@ object AromeGrib {
       val u10 = grib.Feature("u-component_of_wind_height_above_ground")
       val v10 = grib.Feature("v-component_of_wind_height_above_ground")
 
+     // Read only the timestep we need (2D spatial slice)
       (
-        LoadedData(t2m.grid.readDataSlice(-1, -1, -1, -1), t2m.grid, "T2M"),
-        LoadedData(u10.grid.readDataSlice(-1, -1, -1, -1), u10.grid, "U10"),
-        LoadedData(v10.grid.readDataSlice(-1, -1, -1, -1), v10.grid, "V10")
+        LoadedData(t2m.grid.readDataSlice(hourOffset, 0, -1, -1), t2m.grid, "T2M"),
+        LoadedData(u10.grid.readDataSlice(hourOffset, 0, -1, -1), u10.grid, "U10"),
+        LoadedData(v10.grid.readDataSlice(hourOffset, 0, -1, -1), v10.grid, "V10")
       )
     }
 
@@ -87,23 +107,29 @@ object AromeGrib {
       val clouds = grib.Feature.maybe("Low_cloud_cover_surface")
       val terrain = grib.Feature.maybe("Geopotential_height_surface")
 
+      // For flux variables, we need to handle the time index offset
+      val cloudTimeIdx = if (hourOffset == 0) 0 else hourOffset - 1
+
       (
-        cape.map { c => LoadedData(c.grid.readDataSlice(-1, -1, -1, -1), c.grid, "CAPE") },
-        pblh.map { p => LoadedData(p.grid.readDataSlice(-1, -1, -1, -1), p.grid, "PBLH") },
-        clouds.map { c => LoadedData(c.grid.readDataSlice(-1, -1, -1, -1), c.grid, "CLOUDS", isFlux = true) },
-        terrain.map { t => LoadedData(t.grid.readDataSlice(-1, -1, -1, -1), t.grid, "TERRAIN") }
+        cape.map { c => LoadedData(c.grid.readDataSlice(hourOffset, 0, -1, -1), c.grid, "CAPE") },
+        pblh.map { p => LoadedData(p.grid.readDataSlice(hourOffset, 0, -1, -1), p.grid, "PBLH") },
+        clouds.map { c => LoadedData(c.grid.readDataSlice(cloudTimeIdx, 0, -1, -1), c.grid, "CLOUDS", isFlux = true) },
+        terrain.map { t => LoadedData(t.grid.readDataSlice(hourOffset, 0, -1, -1), t.grid, "TERRAIN") }
       )
     }
 
     val sp3Data = Grib.bracket(sp3File) { grib =>
-      val sensible = grib.Feature.maybe("Sensible_heat_net_flux_surface_Mixed_intervals_Accumulation")
-      val latent = grib.Feature.maybe("Latent_heat_net_flux_surface_Mixed_intervals_Accumulation")
-      val solar = grib.Feature.maybe("Net_short_wave_radiation_flux_surface_Mixed_intervals_Accumulation")
+      val sensible = grib.Feature("Sensible_heat_net_flux_surface_Mixed_intervals_Accumulation")
+      val latent = grib.Feature("Latent_heat_net_flux_surface_Mixed_intervals_Accumulation")
+      val solar = grib.Feature("Net_short_wave_radiation_flux_surface_Mixed_intervals_Accumulation")
+
+      // Flux variables: skip hour 0, use hour-1 for other hours
+      val fluxTimeIdx = if (hourOffset == 0) 0 else hourOffset - 1
 
       (
-        sensible.map(s => LoadedData(s.grid.readDataSlice(-1, -1, -1, -1), s.grid, "SHTFL", isFlux = true)),
-        latent.map(l => LoadedData(l.grid.readDataSlice(-1, -1, -1, -1), l.grid, "LHTFL", isFlux = true)),
-        solar.map(s => LoadedData(s.grid.readDataSlice(-1, -1, -1, -1), s.grid, "SOLAR", isFlux = true))
+        LoadedData(sensible.grid.readDataSlice(fluxTimeIdx, 0, -1, -1), sensible.grid, "SHTFL", isFlux = true),
+        LoadedData(latent.grid.readDataSlice(fluxTimeIdx, 0, -1, -1), latent.grid, "LHTFL", isFlux = true),
+        LoadedData(solar.grid.readDataSlice(fluxTimeIdx, 0, -1, -1), solar.grid, "SOLAR", isFlux = true)
       )
     }
 
@@ -121,9 +147,9 @@ object AromeGrib {
           v10 = sp1Data._3.readAtTime(location, hourOffset),
           pblh = sp2Data._2.map(_.readAtTime(location, hourOffset)).getOrElse(0.0),
           cape = sp2Data._1.map(_.readAtTime(location, hourOffset)).getOrElse(0.0),
-          sensibleHeatFlux = sp3Data._1.map(_.readAtTime(location, hourOffset)).getOrElse(0.0),
-          latentHeatFlux = sp3Data._2.map(_.readAtTime(location, hourOffset)).getOrElse(0.0),
-          solarRadiation = sp3Data._3.map(_.readAtTime(location, hourOffset)).getOrElse(0.0),
+          sensibleHeatFlux = sp3Data._1.readAtTime(location, hourOffset),
+          latentHeatFlux = sp3Data._2.readAtTime(location, hourOffset),
+          solarRadiation = sp3Data._3.readAtTime(location, hourOffset),
           cloudCover = sp2Data._3.map(_.readAtTime(location, hourOffset)).getOrElse(0.0),
           terrainElevation = terrainElev,
           windsAtHeights = extractWindsAtHeights(windsDir, location, hourOffset)
@@ -157,7 +183,6 @@ object AromeGrib {
               )
               data.asInstanceOf[ArrayFloat.D2].get(y, x).toDouble
             }
-
             val vVal = Grib.bracket(vFile) { grib =>
               val v = grib.Feature("v-component_of_wind_height_above_ground")
               val data = v.grid.readDataSlice(hourOffset, 0, -1, -1)
@@ -168,15 +193,14 @@ object AromeGrib {
               )
               data.asInstanceOf[ArrayFloat.D2].get(y, x).toDouble
             }
-
             winds(height) = (uVal, vVal)
           } catch {
+
             case e: Exception =>
               logger.warn(s"Error reading winds at ${height}m: ${e.getMessage}")
           }
         }
       }
-
       winds.toMap
     } catch {
       case e: Exception =>
@@ -187,3 +211,4 @@ object AromeGrib {
 
   private def Try[T](fn: => T): scala.util.Try[T] = scala.util.Try(fn)
 }
+
