@@ -31,12 +31,7 @@ const MapHelp = (props: { domain: Domain }): JSX.Element => {
       { m().helpIntro1() } <a href='https://soaringmeteo.org/don.html'>{ m().helpIntro2() }</a> { m().helpIntro3() }
     </p>
     <p>
-      { m().helpCurrentForecast({
-        forecastDate: showDate(state.forecastMetadata.dateAtHourOffset(state.hourOffset), { timeZone: props.domain.timeZone() }),
-        model: props.domain.state.model.name === gfsName ? 'GFS' : 'WRF',
-        initializationTime: showDate(state.forecastMetadata.init, { timeZone: props.domain.timeZone() }),
-        resolution: props.domain.effectiveResolution()
-      }) }
+      { m().helpCurrentForecast() }
       <Switch>
         <Match when={ props.domain.state.model.name === gfsName }>
           {' '}{ m().helpGfsModel1() } <a href="https://www.ncei.noaa.gov/products/weather-climate-models/global-forecast" target="_blank">{ m().helpGfsModel2() }</a> { m().helpGfsModel3() } <a
@@ -101,7 +96,7 @@ const MeteogramHelp = (props: { domain: Domain }): JSX.Element => {
       { m().helpMeteogramScndRow1() } <b>{ m().helpMeteogramScndRow2() }</b> { m().helpMeteogramScndRow3() }
     </p>
     <p>
-      { m().helpMeteogramAirgram({ groundLevel: fakeData.groundLevel }) }
+      { m().helpMeteogramAirgram()
     </p>
     <p>
       { m().helpMeteogramBoundaryLayer1() } <b style={ lightTextStyle('mediumspringgreen') }>{ m().helpMeteogramBoundaryLayer2() }</b>
