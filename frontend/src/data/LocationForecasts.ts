@@ -55,6 +55,7 @@ export class DetailedForecast {
   readonly isothermZero: number | undefined; // m
   readonly aboveGround: Array<AboveGround>; // Sorted by ascending elevation
   readonly winds: DetailedWinds;
+  readonly cape: number | undefined; // J/kg - Convective Available Potential Energy
 
   constructor(data: DetailedForecastData, elevation: number) {
     this.time = new Date(data.t);
@@ -106,6 +107,7 @@ export class DetailedForecast {
       _3000MAMSL: data.w[3],
       _4000MAMSL: data.w[4]
     };
+    this.cape = data.cape;
   }
 
   hourOffsetSinceFirstTimeStep(firstTimeStep: Date): number {
@@ -207,8 +209,9 @@ export type DetailedForecastData = {
     t: number, // total
     c: number // convective
   },
-  // Mean sea level pressure 
+  // Mean sea level pressure
   mslet: number, // hPa
   c: number // Between 0 and 100
   w: Array<{u: number, v: number}>
+  cape?: number // CAPE (Convective Available Potential Energy) in J/kg
 }
