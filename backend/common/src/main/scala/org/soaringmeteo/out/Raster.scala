@@ -169,6 +169,21 @@ object Raster {
         200.0  -> 0xac00dbff
       ).withFallbackColor(0xac00dbff),
       RgbaPngEncoding
+    ),
+    Raster(
+      "cape",
+      doubleData { meteoData =>
+        meteoData.cape.fold(0.0)(_.toJoulesPerKilogram)
+      },
+      ColorMap(
+        0    -> 0xf0f0ff,
+        500  -> 0x96c8ff,
+        1000 -> 0x64ff96,
+        1500 -> 0xffff64,
+        2000 -> 0xff9632,
+        3000 -> 0xc83232
+      ).withFallbackColor(0xc83232),
+      RgbPngEncoding
     )
   )
 
