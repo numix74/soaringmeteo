@@ -53,3 +53,12 @@ Thumbs.db
 # garder ces images logos même si *.png est ignoré
 !images/soaringmeteo.png
 !images/i18n-pr-2.png
+
+# Ignorer les fichiers de base de données
+*.mv.db
+
+# Ignorer le JSON d’output généré automatiquement
+backend/gfs/~/soaringmeteo-data/gfs/output/7/gfs/forecast.json
+
+# Ignorer les répertoires temporaires
+tmp/
