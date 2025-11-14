@@ -96,7 +96,7 @@ const MeteogramHelp = (props: { domain: Domain }): JSX.Element => {
       { m().helpMeteogramScndRow1() } <b>{ m().helpMeteogramScndRow2() }</b> { m().helpMeteogramScndRow3() }
     </p>
     <p>
-      { m().helpMeteogramAirgram()
+      { m().helpMeteogramAirgram() }
     </p>
     <p>
       { m().helpMeteogramBoundaryLayer1() } <b style={ lightTextStyle('mediumspringgreen') }>{ m().helpMeteogramBoundaryLayer2() }</b>
