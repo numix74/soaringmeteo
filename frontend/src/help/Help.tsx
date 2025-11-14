@@ -101,7 +101,7 @@ const MeteogramHelp = (props: { domain: Domain }): JSX.Element => {
     <p>
       { m().helpMeteogramBoundaryLayer1() } <b style={ lightTextStyle('mediumspringgreen') }>{ m().helpMeteogramBoundaryLayer2() }</b>
       {' '}{ m().helpMeteogramBoundaryLayer3() } <a href="https://en.wikipedia.org/wiki/Planetary_boundary_layer" target="_blank">{ m().helpMeteogramBoundaryLayer4() }</a>,
-      {' '}{ m().helpMeteogramBoundaryLayer5({ boundaryLayerDepth: fakeData.groundLevel + fakeData.maxDepth }) }
+      {' '}{ m().helpMeteogramBoundaryLayer5() }
     </p>
     <p>
       { m().helpMeteogramInversion1() } <b style={ lightTextStyle(inversionStyle) }>{ m().helpMeteogramInversion2() }</b> { m().helpMeteogramInversion3() }
@@ -121,7 +121,7 @@ const MeteogramHelp = (props: { domain: Domain }): JSX.Element => {
       { m().helpMeteogramCloudCover() }
     </p>
     <p>
-      { m().helpMeteogramIsotherm1() } <b>{ m().helpMeteogramIsotherm2() }</b>. { m().helpMeteogramIsotherm3({ maxIso: fakeData.maxIso }) }
+      { m().helpMeteogramIsotherm1() } <b>{ m().helpMeteogramIsotherm2() }</b>. { m().helpMeteogramIsotherm3() }
     </p>
     <p>
       { m().helpMeteogramPressure1() } <b style="color: red">{ m().helpMeteogramPressure2() }</b>. { m().helpMeteogramPressure3() }
