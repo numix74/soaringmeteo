@@ -1,0 +1,960 @@
+nohup: les entrées sont ignorées
+[info] welcome to sbt 1.9.7 (Ubuntu Java 17.0.16)
+[info] loading settings for project backend-build from plugins.sbt ...
+[info] loading project definition from /home/ubuntu/soaringmeteo/backend/project
+[info] loading settings for project soaringmeteo from build.sbt ...
+[info] set current project to soaringmeteo (in build file:/home/ubuntu/soaringmeteo/backend/)
+[info] compiling 1 Scala source to /home/ubuntu/soaringmeteo/backend/arome/target/scala-2.13/classes ...
+[info] done compiling
+[info] running (fork) org.soaringmeteo.arome.Main /home/ubuntu/soaringmeteo/backend/arome_pays_basque.conf
+[info] 20:44:16.913 [main] INFO org.soaringmeteo.arome.Main$ -- === AROME Production Pipeline ===
+[info] 20:44:16.917 [main] INFO org.soaringmeteo.arome.Main$ -- Initialization time: 2025-11-10T20:44:16.911349240Z
+[info] 20:44:16.921 [main] INFO org.soaringmeteo.arome.Main$ -- Zones to process: Pays Basque
+[info] 20:44:17.146 [main] DEBUG slick.basic.BasicBackend.action -- #1: : StreamingInvokerAction$HeadAction 
+[info]     : [
+[info]     :           SELECT EXISTS (
+[info]     :             SELECT * FROM INFORMATION_SCHEMA.TABLES
+[info]     :             WHERE TABLE_NAME = 'arome_grids'
+[info]     :           )
+[info]     :         ]
+[info] 20:44:17.467 [AsyncExecutor.default-1] DEBUG slick.jdbc.JdbcBackend.statement -- Preparing statement: 
+[info]           SELECT EXISTS (
+[info]             SELECT * FROM INFORMATION_SCHEMA.TABLES
+[info]             WHERE TABLE_NAME = 'arome_grids'
+[info]           )
+[info]         
+[info] 20:44:17.496 [AsyncExecutor.default-1] DEBUG slick.jdbc.JdbcBackend.statement -- Executing prepared statement: prep0: 
+[info]           SELECT EXISTS (
+[info]             SELECT * FROM INFORMATION_SCHEMA.TABLES
+[info]             WHERE TABLE_NAME = 'arome_grids'
+[info] 20:44:17.497 [AsyncExecutor.default-1] DEBUG slick.jdbc.JdbcBackend.statementAndParameter -- Executing prepared statement: prep0: 
+[info]           SELECT EXISTS (
+[info]             SELECT * FROM INFORMATION_SCHEMA.TABLES
+[info]             WHERE TABLE_NAME = 'arome_grids'
+[info] 20:44:17.506 [AsyncExecutor.default-1] DEBUG slick.jdbc.JdbcBackend.benchmark -- Execution of prepared statement took 9ms
+[info] 20:44:17.546 [AsyncExecutor.default-1] DEBUG slick.jdbc.StatementInvoker.result -- /------\
+[info] 20:44:17.546 [AsyncExecutor.default-1] DEBUG slick.jdbc.StatementInvoker.result -- | 1    |
+[info] 20:44:17.546 [AsyncExecutor.default-1] DEBUG slick.jdbc.StatementInvoker.result -- | C1   |
+[info] 20:44:17.546 [AsyncExecutor.default-1] DEBUG slick.jdbc.StatementInvoker.result -- |------|
+[info] 20:44:17.546 [AsyncExecutor.default-1] DEBUG slick.jdbc.StatementInvoker.result -- | true |
+[info] 20:44:17.546 [AsyncExecutor.default-1] DEBUG slick.jdbc.StatementInvoker.result -- \------/
+[info] 20:44:17.585 [main] INFO org.soaringmeteo.arome.Main$ -- 
+[info] Processing zone: Pays Basque
+[info] 20:44:17.611 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.Main$ --   Processing hour 6...
+[info] 20:44:17.611 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.Main$ --   Processing hour 7...
+[info] 20:44:17.612 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.Main$ --   Processing hour 8...
+[info] 20:44:17.613 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.Main$ --   Processing hour 9...
+[info] 20:44:17.616 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.Main$ --   Processing hour 10...
+[info] 20:44:17.616 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.Main$ --   Processing hour 11...
+[info] 20:44:17.622 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 8 depuis hour_8.grib2
+[info] 20:44:17.622 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 11 depuis hour_11.grib2
+[info] 20:44:17.622 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 10 depuis hour_10.grib2
+[info] 20:44:17.622 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 7 depuis hour_7.grib2
+[info] 20:44:17.624 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 9 depuis hour_9.grib2
+[info] 20:44:17.627 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 6 depuis hour_6.grib2
+[info] 20:44:17.740 [scala-execution-context-global-18] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:17.740 [scala-execution-context-global-20] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:17.740 [scala-execution-context-global-19] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:17.740 [scala-execution-context-global-22] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:17.740 [scala-execution-context-global-21] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:17.740 [scala-execution-context-global-23] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:17.769 [scala-execution-context-global-23] DEBUG cacheLogger -- DiskCache2 create directory /home/ubuntu/.unidata/cache/
+[info] 20:44:17.811 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_11.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:17.811 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 888
+[info] 20:44:17.811 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_8.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:17.811 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 886
+[info] 20:44:17.811 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_6.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:17.811 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_10.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:17.811 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_9.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:17.812 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 886
+[info] 20:44:17.812 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 886
+[info] 20:44:17.812 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 888
+[info] 20:44:17.811 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_7.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:17.814 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 886
+[info] 20:44:18.084 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 12
+[info] 20:44:18.084 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:18.091 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 12
+[info] 20:44:18.092 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 12
+[info] 20:44:18.092 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 12
+[info] 20:44:18.093 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:18.882 [scala-execution-context-global-19] DEBUG edu.ucar.unidata.compression.jna.libaec.LibAec -- Using libaec library from system
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:19.657 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] 20:44:19.657 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] hello
+[info] 20:44:19.663 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:19.666 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:19.682 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:19.715 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:19.719 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:19.721 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] hello
+[info] 20:44:19.732 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:19.750 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:19.782 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:19.813 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:19.827 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:19.828 [scala-execution-context-global-20] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:19.828 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_8.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:19.829 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 920
+[info] 20:44:19.829 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 12
+[info] 20:44:19.829 [scala-execution-context-global-19] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:19.830 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_6.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:19.830 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 920
+[info] 20:44:19.830 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 12
+[info] 20:44:19.830 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:19.834 [scala-execution-context-global-23] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:19.834 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_11.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:19.835 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 922
+[info] 20:44:19.835 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:19.841 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:19.844 [scala-execution-context-global-18] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:19.844 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_7.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:19.844 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 920
+[info] 20:44:19.845 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 12
+[info] hello
+[info] hello
+[info] 20:44:19.858 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:19.898 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:19.903 [scala-execution-context-global-22] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:19.904 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_10.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:19.905 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 922
+[info] 20:44:19.906 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:19.997 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:20.001 [scala-execution-context-global-21] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:20.002 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_9.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:20.002 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 920
+[info] 20:44:20.002 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 12
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:20.248 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:20.257 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:20.308 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:20.328 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:20.335 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] hello
+[info] 20:44:20.345 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:20.359 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:20.417 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:20.455 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:20.459 [scala-execution-context-global-20] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:20.460 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_8.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:20.460 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1202
+[info] 20:44:20.460 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 12
+[info] 20:44:20.463 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:20.465 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] 20:44:20.466 [scala-execution-context-global-23] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:20.466 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_11.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:20.466 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1204
+[info] 20:44:20.467 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] 20:44:20.477 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] 20:44:20.478 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:20.479 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:20.490 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:20.490 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] hello
+[info] 20:44:20.508 [scala-execution-context-global-23] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 11
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 9364053 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:20.508 [scala-execution-context-global-20] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 8
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 6952782 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:20.512 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.Main$ --   Processing hour 12...
+[info] 20:44:20.512 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.Main$ --   Processing hour 13...
+[info] 20:44:20.512 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 13 depuis hour_13.grib2
+[info] 20:44:20.513 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 12 depuis hour_12.grib2
+[info] 20:44:20.519 [scala-execution-context-global-20] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:20.519 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_13.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:20.519 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 888
+[info] 20:44:20.519 [scala-execution-context-global-23] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:20.520 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_12.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:20.520 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 888
+[info] 20:44:20.521 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:20.521 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:20.543 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:20.548 [scala-execution-context-global-18] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:20.549 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_7.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:20.549 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1202
+[info] 20:44:20.549 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 12
+[info] 20:44:20.555 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] hello
+[info] 20:44:20.573 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:20.573 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:20.574 [scala-execution-context-global-18] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 7
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 6149025 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:20.588 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.Main$ --   Processing hour 14...
+[info] 20:44:20.588 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 14 depuis hour_14.grib2
+[info] 20:44:20.597 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:20.602 [scala-execution-context-global-18] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:20.602 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_14.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:20.602 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 888
+[info] 20:44:20.607 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] 20:44:20.643 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:20.646 [scala-execution-context-global-19] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:20.646 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_6.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:20.646 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1202
+[info] 20:44:20.647 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 12
+[info] 20:44:20.658 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:20.659 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:20.659 [scala-execution-context-global-19] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 6
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 5345268 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:20.660 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.Main$ --   Processing hour 15...
+[info] 20:44:20.660 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 15 depuis hour_15.grib2
+[info] 20:44:20.662 [scala-execution-context-global-19] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:20.662 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_15.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:20.662 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 888
+[info] 20:44:20.662 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] hello
+[info] 20:44:20.681 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:20.702 [scala-execution-context-global-22] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:20.702 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_10.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:20.702 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1204
+[info] 20:44:20.708 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:20.720 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:20.725 [scala-execution-context-global-21] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:20.726 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_9.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:20.730 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1202
+[info] 20:44:20.732 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 12
+[info] 20:44:20.752 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:20.752 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:20.753 [scala-execution-context-global-22] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 10
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 8560296 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:20.753 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.Main$ --   Processing hour 16...
+[info] 20:44:20.753 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 16 depuis hour_16.grib2
+[info] 20:44:20.762 [scala-execution-context-global-22] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:20.763 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_16.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:20.763 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 888
+[info] 20:44:20.764 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:20.769 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:20.769 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:20.776 [scala-execution-context-global-21] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 9
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 7756539 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:20.779 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.Main$ --   Processing hour 17...
+[info] 20:44:20.780 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 17 depuis hour_17.grib2
+[info] 20:44:20.794 [scala-execution-context-global-21] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:20.804 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_17.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:20.804 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 888
+[info] hello
+[info] 20:44:20.805 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:21.026 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:21.051 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:21.089 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:21.094 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:21.110 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:21.127 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:21.132 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] hello
+[info] 20:44:21.161 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:21.163 [scala-execution-context-global-23] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.164 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_12.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:21.164 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 922
+[info] 20:44:21.165 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:21.166 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] hello
+[info] 20:44:21.175 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:21.177 [scala-execution-context-global-19] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.177 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_15.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:21.177 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 922
+[info] 20:44:21.178 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] 20:44:21.192 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:21.207 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:21.237 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:21.240 [scala-execution-context-global-20] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.241 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_13.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:21.242 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 922
+[info] 20:44:21.242 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:21.270 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:21.276 [scala-execution-context-global-22] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.277 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_16.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:21.277 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 922
+[info] 20:44:21.277 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] 20:44:21.295 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:21.298 [scala-execution-context-global-18] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.298 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_14.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:21.298 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 922
+[info] 20:44:21.299 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:21.390 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:21.456 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:21.539 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:21.542 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:21.555 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:21.567 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:21.571 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] 20:44:21.573 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] hello
+[info] 20:44:21.604 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:21.607 [scala-execution-context-global-23] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.607 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_12.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:21.607 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1204
+[info] 20:44:21.608 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:21.623 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:21.631 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] 20:44:21.631 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:21.632 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] hello
+[info] 20:44:21.633 [scala-execution-context-global-23] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 12
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 10167810 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:21.634 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.Main$ --   Processing hour 18...
+[info] 20:44:21.634 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 18 depuis hour_18.grib2
+[info] 20:44:21.639 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:21.644 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:21.666 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:21.668 [scala-execution-context-global-23] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.669 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_18.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:21.669 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 888
+[info] 20:44:21.670 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:21.670 [scala-execution-context-global-21] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.670 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_17.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:21.670 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 922
+[info] 20:44:21.671 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] hello
+[info] 20:44:21.715 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:21.717 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:21.717 [scala-execution-context-global-18] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.718 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_14.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:21.718 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1204
+[info] 20:44:21.718 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:21.718 [scala-execution-context-global-19] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.718 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_15.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:21.718 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1204
+[info] 20:44:21.719 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:21.725 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:21.725 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:21.726 [scala-execution-context-global-18] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 14
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 11775324 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:21.726 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.Main$ --   Processing hour 19...
+[info] 20:44:21.726 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 19 depuis hour_19.grib2
+[info] 20:44:21.727 [scala-execution-context-global-18] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.728 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_19.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:21.728 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 888
+[info] 20:44:21.728 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] 20:44:21.735 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:21.735 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:21.735 [scala-execution-context-global-19] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 15
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 12579081 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:21.736 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.Main$ --   Processing hour 20...
+[info] 20:44:21.736 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 20 depuis hour_20.grib2
+[info] 20:44:21.738 [scala-execution-context-global-19] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.738 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_20.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:21.738 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 888
+[info] 20:44:21.738 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:21.743 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:21.745 [scala-execution-context-global-22] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.745 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_16.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:21.745 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1204
+[info] 20:44:21.746 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:21.752 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:21.752 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:21.753 [scala-execution-context-global-22] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 16
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 13382838 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:21.753 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.Main$ --   Processing hour 21...
+[info] 20:44:21.753 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.AromeGrib$ -- Lecture AROME heure 21 depuis hour_21.grib2
+[info] 20:44:21.755 [scala-execution-context-global-22] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.755 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp1/hour_21.grib2.ncx4 (Grib2Collectio2Index) records len = 135
+[info] 20:44:21.755 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 888
+[info] 20:44:21.755 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] hello
+[info] 20:44:21.784 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:21.786 [scala-execution-context-global-20] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:21.787 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_13.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:21.787 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1204
+[info] 20:44:21.787 [scala-execution-context-global-20] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] hello
+[info] 20:44:21.804 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:21.804 [scala-execution-context-global-20] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:21.805 [scala-execution-context-global-20] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 13
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 10971567 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:21.949 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] hello
+[info] 20:44:21.977 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:21.996 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:22.002 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:22.010 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:22.036 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- T2M shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:22.050 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:22.060 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:22.076 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:22.080 [scala-execution-context-global-18] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:22.081 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_19.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:22.081 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 922
+[info] 20:44:22.082 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] 20:44:22.103 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:22.112 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- U10 shape: 1x1x717x1121 (rank=4)
+[info] hello
+[info] 20:44:22.114 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:22.118 [scala-execution-context-global-21] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:22.118 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_17.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:22.119 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1204
+[info] 20:44:22.119 [scala-execution-context-global-21] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:22.120 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:22.122 [scala-execution-context-global-22] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:22.122 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_21.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:22.122 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 922
+[info] 20:44:22.122 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:22.129 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:22.129 [scala-execution-context-global-21] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] hello
+[info] 20:44:22.129 [scala-execution-context-global-21] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 17
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 14186595 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] hello
+[info] 20:44:22.154 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:22.156 [scala-execution-context-global-19] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:22.157 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_20.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:22.157 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 922
+[info] 20:44:22.159 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] hello
+[info] 20:44:22.196 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- V10 shape: 1x1x717x1121 (rank=4)
+[info] 20:44:22.199 [scala-execution-context-global-23] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:22.199 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp2/hour_18.grib2.ncx4 (Grib2Collectio2Index) records len = 147
+[info] 20:44:22.199 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 922
+[info] 20:44:22.200 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:22.310 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] hello
+[info] hello
+[info] 20:44:22.354 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:22.364 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] hello
+[info] 20:44:22.407 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:22.415 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:22.438 [scala-execution-context-global-18] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:22.439 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_19.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:22.439 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1204
+[info] 20:44:22.440 [scala-execution-context-global-18] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:22.452 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:22.460 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:22.460 [scala-execution-context-global-18] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:22.461 [scala-execution-context-global-18] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 19
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 15794109 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:22.465 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- CAPE shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:22.481 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:22.496 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:22.498 [scala-execution-context-global-22] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:22.498 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_21.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:22.498 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1204
+[info] 20:44:22.502 [scala-execution-context-global-22] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:22.507 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:22.507 [scala-execution-context-global-22] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:22.508 [scala-execution-context-global-22] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 21
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 17401623 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:22.527 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- PBLH shape: 1x717x1121 (rank=3)
+[info] hello
+[info] 20:44:22.529 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:22.542 [scala-execution-context-global-19] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:22.543 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_20.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:22.543 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1204
+[info] 20:44:22.544 [scala-execution-context-global-19] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:22.554 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:22.555 [scala-execution-context-global-19] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:22.555 [scala-execution-context-global-19] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 20
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 16597866 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:22.574 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.LoadedData -- CLOUDS shape: 1x717x1121 (rank=3)
+[info] 20:44:22.576 [scala-execution-context-global-23] DEBUG ucar.nc2.NetcdfFile -- Using IOSP ucar.nc2.grib.collection.Grib2Iosp
+[info] 20:44:22.576 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/sp3/hour_18.grib2.ncx4 (Grib2Collectio2Index) records len = 163
+[info] 20:44:22.576 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex proto len = 1204
+[info] 20:44:22.577 [scala-execution-context-global-23] DEBUG ucar.nc2.grib.collection.Grib2Iosp -- GribCollectionBuilderFromIndex files len = 13
+[info] 20:44:22.582 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.AromeGrib$ -- Extraction 141x61 points...
+[info] 20:44:22.582 [scala-execution-context-global-23] INFO org.soaringmeteo.arome.AromeGrib$ -- Reading winds from: /mnt/soaringmeteo-data/arome/grib/pays_basque_by_hour/winds
+[info] 20:44:22.583 [scala-execution-context-global-23] ERROR org.soaringmeteo.arome.Main$ -- Error processing hour 18
+[info] java.lang.ArrayIndexOutOfBoundsException: Index 14990352 out of bounds for length 803757
+[info] 	at ucar.ma2.ArrayFloat$D4.get(ArrayFloat.java:447)
+[info] 	at org.soaringmeteo.arome.LoadedData.readAtTime(AromeGrib.scala:47)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12(AromeGrib.scala:119)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$12$adapted(AromeGrib.scala:114)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11(AromeGrib.scala:114)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.$anonfun$fromGroupFiles$11$adapted(AromeGrib.scala:113)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:2140)
+[info] 	at scala.collection.immutable.Vector2.map(Vector.scala:443)
+[info] 	at org.soaringmeteo.arome.AromeGrib$.fromGroupFiles(AromeGrib.scala:113)
+[info] 	at org.soaringmeteo.arome.Main$.$anonfun$processZone$2(Main.scala:70)
+[info] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
+[info] 	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:687)
+[info] 	at scala.concurrent.impl.Promise$Transformation.run(Promise.scala:467)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1395)
+[info] 	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+[info] 	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+[info] 	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+[info] 20:44:22.584 [main] INFO org.soaringmeteo.arome.Main$ -- Zone Pays Basque completed
+[info] 20:44:22.587 [main] INFO org.soaringmeteo.arome.Main$ -- 
+[info] === AROME Pipeline Complete ===
+[success] Total time: 13 s, completed 10 nov. 2025, 20:44:22
