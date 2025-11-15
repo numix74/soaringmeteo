@@ -1,17 +1,58 @@
 package org.soaringmeteo.arome
 
+/**
+ * Atmospheric data at a specific altitude level for AROME vertical profiles.
+ * @param u Wind u-component (m/s)
+ * @param v Wind v-component (m/s)
+ * @param temperature Temperature (K)
+ * @param dewPoint Dew point temperature (K)
+ * @param cloudCover Cloud cover (0-1 fraction)
+ */
+case class AromeAirData(
+  u: Double,
+  v: Double,
+  temperature: Double,
+  dewPoint: Double,
+  cloudCover: Double
+)
+
+/**
+ * Complete AROME meteorological data for a single grid point and timestep.
+ * Includes surface fields, vertical profiles, and derived parameters.
+ */
 case class AromeData(
+  // Surface temperature and winds
   t2m: Double,
   u10: Double,
   v10: Double,
+
+  // Boundary layer and convection
   pblh: Double,
   cape: Double,
+
+  // Surface fluxes
   sensibleHeatFlux: Double,
   latentHeatFlux: Double,
   solarRadiation: Double,
+
+  // Cloud and precipitation
   cloudCover: Double,
-  terrainElevation: Double = 0.0,
-  windsAtHeights: Map[Int, (Double, Double)] = Map.empty
+  totalRain: Double = 0.0,  // mm
+  snowDepth: Double = 0.0,  // m
+
+  // Surface humidity and pressure
+  dewPoint2m: Double = 273.15,  // K (default to 0°C if missing)
+  mslet: Double = 101325.0,  // Pa (default to 1013.25 hPa if missing)
+
+  // Altitude markers
+  isothermZero: Option[Double] = None,  // m AMSL
+  terrainElevation: Double = 0.0,  // m AMSL
+
+  // Winds at discrete heights (for wind barbs)
+  windsAtHeights: Map[Int, (Double, Double)] = Map.empty,  // height (m AGL) -> (u, v) in m/s
+
+  // Vertical profiles (for soundings)
+  airDataByAltitude: Map[Int, AromeAirData] = Map.empty  // altitude (m AMSL) -> AromeAirData
 ) {
   def thermalVelocity: Double = {
     val g = 9.81
@@ -29,6 +70,8 @@ case class AromeData(
     (270 - dir) % 360
   }
   def t2mCelsius: Double = t2m - 273.15
+  def dewPoint2mCelsius: Double = dewPoint2m - 273.15
+  def msletHPa: Double = mslet / 100.0  // Pa -> hPa
   def windAtHeight(heightAGL: Int): Option[(Double, Double)] = windsAtHeights.get(heightAGL)
   def windAtHeightInterpolated(targetHeightAGL: Double): Option[(Double, Double)] = {
     if (windsAtHeights.isEmpty) return None
