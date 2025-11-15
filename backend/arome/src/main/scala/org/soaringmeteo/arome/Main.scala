@@ -3,12 +3,12 @@ package org.soaringmeteo.arome
 import scala.concurrent.{ExecutionContext, Future, Await}
 import scala.concurrent.duration.Duration
 import org.slf4j.LoggerFactory
-import java.time.OffsetDateTime
+import java.time.{OffsetDateTime, Period}
 import os.Path
-import org.soaringmeteo.MeteoData
-import org.soaringmeteo.arome.out.{Store, AromeLocationJson}
-import org.soaringmeteo.out.ForecastMetadata
-import org.soaringmeteo.InitDateString
+import org.soaringmeteo.{InitDateString, MeteoData}
+import org.soaringmeteo.arome.out.Store
+import org.soaringmeteo.out.{JsonData, OutputPaths, touchMarkerFile, ForecastMetadata}
+import geotrellis.vector.Extent
 
 object Main {
   private val logger = LoggerFactory.getLogger(getClass)
@@ -32,73 +32,27 @@ object Main {
 
     logger.info("=== AROME Production Pipeline ===")
     logger.info(s"Initialization time: $initTime")
+    logger.info(s"Init date string: $initDateString")
     logger.info(s"Zones to process: ${settings.zones.map(_.name).mkString(", ")}")
 
     Await.result(Store.ensureSchemaExists(), Duration.Inf)
 
-    // Process each zone
+    // Determine output directory (use first zone's output dir as base)
+    val outputBaseDir = os.Path(settings.zones.head.outputDirectory)
+
     for (setting <- settings.zones) {
       logger.info(s"\nProcessing zone: ${setting.name}")
-      val outputBaseDir = os.Path(setting.outputDirectory)
+      // Use harmonized output paths
       processZone(initTime, initDateString, setting, outputBaseDir)
     }
 
-    // Generate forecast.json for AROME
-    val firstZoneSetting = settings.zones.head
-    val outputBaseDir = os.Path(firstZoneSetting.outputDirectory)
-    generateForecastMetadata(settings, outputBaseDir, initTime, initDateString)
+    // Generate forecast.json metadata
+    logger.info("\nGenerating forecast metadata...")
+    writeForecastMetadata(initTime, initDateString, settings, outputBaseDir)
 
     Store.close()
+    touchMarkerFile(outputBaseDir)
     logger.info("\n=== AROME Pipeline Complete ===")
-  }
-
-  private def generateForecastMetadata(
-    settings: Settings,
-    outputBaseDir: os.Path,
-    initTime: OffsetDateTime,
-    initDateString: String
-  ): Unit = {
-    val versionedDir = out.versionedTargetPath(outputBaseDir)
-    val forecastJsonPath = versionedDir / "forecast.json"
-    
-    val zones = settings.zones.map { zoneSetting =>
-      val zoneId = zoneSetting.name.toLowerCase.replace(" ", "-")
-      val zone = zoneSetting.zone
-      val lonMin = zone.longitudes.min
-      val lonMax = zone.longitudes.max
-      val latMin = zone.latitudes.min
-      val latMax = zone.latitudes.max
-      val step = if (zone.longitudes.size > 1) {
-        BigDecimal((zone.longitudes(1) - zone.longitudes(0)).abs)
-      } else BigDecimal(0.025)
-      
-      ForecastMetadata.Zone(
-        id = zoneId,
-        label = zoneSetting.name,
-        raster = ForecastMetadata.Raster(
-          projection = "EPSG:4326",
-          resolution = step,
-          extent = geotrellis.vector.Extent(lonMin, latMin, lonMax, latMax).buffer((step / 2).toDouble)
-        ),
-        vectorTiles = ForecastMetadata.VectorTiles(
-          AromeVectorTilesParameters(zone),
-          300
-        )
-      )
-    }
-    
-    val metadata = ForecastMetadata(
-      dataPath = initDateString,
-      initDateTime = initTime,
-      maybeFirstTimeStep = None,
-      latestHourOffset = 24,
-      zones = zones
-    )
-    
-    logger.info(s"Writing forecast metadata to $forecastJsonPath")
-    // jsonCodec works on Seq[ForecastMetadata], so wrap in a Seq
-    val jsonString = ForecastMetadata.jsonCodec.apply(Seq(metadata)).spaces2
-    os.write.over(forecastJsonPath, jsonString, createFolders = true)
   }
 
   private def processZone(
@@ -114,26 +68,32 @@ object Main {
       return
     }
 
-    val versionedDir = out.versionedTargetPath(outputBaseDir)
-    val runDir = out.runTargetPath(versionedDir, initDateString)
+    // Use harmonized output paths
     val zoneId = setting.name.toLowerCase.replace(" ", "-")
-    val zoneDir = out.zoneTargetPath(runDir, zoneId)
-    val mapsBaseDir = zoneDir / "maps"
-    val locationDir = zoneDir / "locations"
-    
+    val zoneOutputDir = OutputPaths.zoneOutputDir(outputBaseDir, "arome", initDateString, zoneId)
+    val mapsBaseDir = OutputPaths.mapsDir(outputBaseDir, "arome", initDateString, zoneId)
+    val locationDir = OutputPaths.locationDir(outputBaseDir, "arome", initDateString, zoneId)
+
+    // Create directories
+    os.makeDir.all(zoneOutputDir)
     os.makeDir.all(mapsBaseDir)
     os.makeDir.all(locationDir)
 
+    // Définir les groupes de fichiers GRIB
     val groups = Seq(
       ("00H06H", 0 to 6),
       ("07H12H", 7 to 12),
       ("13H18H", 13 to 18),
       ("19H24H", 19 to 24)
+      // Ajoutez les autres groupes si vous les avez :
+      // ("25H30H", 25 to 30),
+      // ("31H36H", 31 to 36),
+      // ("37H42H", 37 to 42)
     )
 
     val futures = scala.collection.mutable.ListBuffer[Future[Unit]]()
-    val allData = scala.collection.mutable.Map[Int, IndexedSeq[IndexedSeq[AromeData]]]()
 
+    // Traiter chaque groupe de fichiers
     groups.foreach { case (groupName, hours) =>
       logger.info(s"Processing group $groupName (hours ${hours.head}-${hours.last})...")
 
@@ -142,57 +102,67 @@ object Main {
       val sp3File = gribDir / s"SP3_${groupName}.grib2"
       val windsDir = gribDir / "winds"
 
-      if (!os.exists(sp1File) || !os.exists(sp2File) || !os.exists(sp3File)) {
-        logger.warn(s"Missing files for group $groupName")
+      // Vérifier que tous les fichiers existent
+      if (!os.exists(sp1File)) {
+        logger.warn(s"Missing file: $sp1File")
+        return
+      }
+      if (!os.exists(sp2File)) {
+        logger.warn(s"Missing file: $sp2File")
+        return
+      }
+      if (!os.exists(sp3File)) {
+        logger.warn(s"Missing file: $sp3File")
         return
       }
 
+      // Traiter chaque heure du groupe
       hours.foreach { hour =>
-        val hourOffsetInGroup = hour - hours.head
+        val hourOffsetInGroup = hour - hours.head  // 0, 1, 2, 3, 4, 5, 6 pour le premier groupe
 
         val future = Future {
           try {
-            logger.info(s"  Processing hour $hour...")
+            logger.info(s"  Processing hour $hour (offset $hourOffsetInGroup in file $groupName)...")
 
             val data = AromeGrib.fromGroupFiles(
               sp1File = sp1File,
               sp2File = sp2File,
               sp3File = sp3File,
               windsDir = windsDir,
-              hourOffset = hourOffsetInGroup,
+              hourOffset = hourOffsetInGroup,  // Offset DANS le fichier groupe
               zone = setting.zone
             )
-
-            synchronized { allData(hour) = data }
 
             val meteoData: IndexedSeq[IndexedSeq[MeteoData]] = data.map { row =>
               row.map { aromeData =>
                 new AromeMeteoDataAdapter(aromeData, initTime.plusHours(hour))
               }
             }
-            
-            val hourMapsDir = mapsBaseDir / f"${hour}%02d"
+
+            // Use harmonized hour directory path
+            val hourMapsDir = OutputPaths.hourMapsDir(outputBaseDir, "arome", initDateString, zoneId, hour)
             os.makeDir.all(hourMapsDir)
-            
-            logger.debug(s"    Generating PNG...")
+
+            logger.debug(s"    Generating PNG to $hourMapsDir...")
             org.soaringmeteo.out.Raster.writeAllPngFiles(
               setting.zone.longitudes.size,
               setting.zone.latitudes.size,
-              hourMapsDir,
+              zoneOutputDir,  // Base directory for zone
               hour,
               meteoData
             )
-            
             logger.debug(s"    Generating MVT...")
             org.soaringmeteo.out.VectorTiles.writeAllVectorTiles(
               AromeVectorTilesParameters(setting.zone),
-              hourMapsDir,
+              zoneOutputDir,  // Base directory for zone
               hour,
               meteoData
             )
-            
             logger.debug(s"    Saving to database...")
-            Await.result(Store.save(initTime, setting.name, hour, data), Duration.Inf)
+            Await.result(
+              Store.save(initTime, setting.name, hour, data),
+              Duration.Inf
+            )
 
             logger.info(s"  Hour $hour completed")
           } catch {
@@ -205,15 +175,101 @@ object Main {
     }
 
     Await.result(Future.sequence(futures), Duration.Inf)
-    
-    logger.info(s"Generating location JSON files for zone ${setting.name}...")
-    AromeLocationJson.writeLocationForecasts(
-      zone = setting.zone,
-      initTime = initTime,
-      allData = allData.toMap,
-      outputDir = locationDir
-    )
-    
+
+    // Generate location JSON files
+    logger.info(s"Generating location forecasts for zone ${setting.name}...")
+    generateLocationForecasts(initTime, setting, zoneOutputDir)
+
     logger.info(s"Zone ${setting.name} completed")
+  }
+
+  private def generateLocationForecasts(
+    initTime: OffsetDateTime,
+    setting: AromeSetting,
+    zoneOutputDir: os.Path
+  ): Unit = {
+    val width = setting.zone.longitudes.size
+    val height = setting.zone.latitudes.size
+
+    org.soaringmeteo.arome.out.AromeLocationJson.writeForecastsByLocation(
+      zoneName = setting.name,
+      width = width,
+      height = height,
+      targetDir = zoneOutputDir
+    ) { (x, y) =>
+      // Retrieve all hours for this location from the database
+      val dataByHour = Await.result(
+        Store.getDataForLocation(initTime, setting.name, x, y),
+        Duration.Inf
+      )
+
+      // Convert to Map[hourOffset, (AromeData, OffsetDateTime)]
+      dataByHour.map { case (hourOffset, data) =>
+        hourOffset -> (data, initTime.plusHours(hourOffset))
+      }
+    }
+  }
+
+  /**
+   * Generate forecast.json metadata file for all zones.
+   * This file is consumed by the frontend to know what forecast data is available.
+   */
+  private def writeForecastMetadata(
+    initTime: OffsetDateTime,
+    initDateString: String,
+    settings: Settings,
+    outputBaseDir: os.Path
+  ): Unit = {
+    val modelOutputDir = OutputPaths.modelOutputDir(outputBaseDir, "arome")
+
+    // Create zone metadata for each AROME zone
+    val zones = settings.zones.map { setting =>
+      val zoneId = setting.name.toLowerCase.replace(" ", "-")
+      val zone = setting.zone
+
+      // Calculate extent from zone lat/lon
+      val minLon = zone.longitudes.head
+      val maxLon = zone.longitudes.last
+      val minLat = zone.latitudes.last
+      val maxLat = zone.latitudes.head
+
+      // Calculate resolution (spacing between points)
+      val resolution = if (zone.longitudes.size > 1) {
+        BigDecimal(zone.longitudes(1) - zone.longitudes(0))
+      } else {
+        BigDecimal(0.025) // default
+      }
+
+      // Buffer extent by half resolution (like GFS does)
+      val bufferedExtent = Extent(minLon, minLat, maxLon, maxLat)
+        .buffer((resolution / 2).doubleValue)
+
+      // Create vector tiles parameters
+      val vectorTilesParams = AromeVectorTilesParameters(zone)
+
+      ForecastMetadata.Zone(
+        id = zoneId,
+        label = setting.name,
+        raster = ForecastMetadata.Raster(
+          projection = "EPSG:4326", // WGS84
+          resolution = resolution,
+          extent = bufferedExtent
+        ),
+        vectorTiles = ForecastMetadata.VectorTiles(vectorTilesParams, tileSize = 512)
+      )
+    }
+
+    // Write forecast.json (similar to GFS)
+    ForecastMetadata.overwriteLatestForecastMetadata(
+      targetDir = modelOutputDir,
+      history = Period.ofDays(2), // Keep 2 days of history
+      initDateString = initDateString,
+      initDateTime = initTime,
+      maybeFirstTimeStep = None, // First timestep is same as init time for AROME
+      latestHourOffset = 24, // AROME provides 25 hours (0-24)
+      zones = zones
+    )
+
+    logger.info(s"Forecast metadata written to ${modelOutputDir / "forecast.json"}")
   }
 }

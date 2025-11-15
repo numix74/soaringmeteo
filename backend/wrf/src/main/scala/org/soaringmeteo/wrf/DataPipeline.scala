@@ -3,7 +3,7 @@ package org.soaringmeteo.wrf
 import cats.data.NonEmptyList
 import org.slf4j.LoggerFactory
 import org.soaringmeteo.InitDateString
-import org.soaringmeteo.out.{ForecastMetadata, JsonData, Raster, VectorTiles, deleteOldData, formatVersion, touchMarkerFile}
+import org.soaringmeteo.out.{ForecastMetadata, JsonData, OutputPaths, Raster, VectorTiles, deleteOldData, touchMarkerFile}
 
 import java.time.OffsetDateTime
 
@@ -17,20 +17,24 @@ object DataPipeline {
     initDateTime: OffsetDateTime,
     firstTimeStep: OffsetDateTime,
   ): Unit = {
-    // Output directory of the WRF results
-    val modelTargetDir =
-      outputDir / formatVersion.toString / "wrf"
-
     val initDateString = InitDateString(initDateTime)
-    // Output directory of the current forecast run
-    val runTargetDir = modelTargetDir / initDateString
+
+    // Use harmonized output paths
+    val modelTargetDir = OutputPaths.modelOutputDir(outputDir, "wrf")
+    val runTargetDir = OutputPaths.runOutputDir(outputDir, "wrf", initDateString)
 
     // Process all the input files (grids) one by one
     val results =
       for (inputFile <- inputFiles) yield {
         logger.info(s"Processing file ${inputFile}")
         val grid = Grid.find(inputFile)
-        val metadata = processFile(inputFile, grid, runTargetDir)
+
+        // Create zone directories
+        val zoneOutputDir = OutputPaths.zoneOutputDir(outputDir, "wrf", initDateString, grid.outputPath)
+        os.makeDir.all(zoneOutputDir / "maps")
+        os.makeDir.all(zoneOutputDir / "location")
+
+        val metadata = processFile(inputFile, grid, zoneOutputDir)
         (grid, metadata)
       }
 
@@ -49,11 +53,10 @@ object DataPipeline {
     touchMarkerFile(outputDir)
   }
 
-  private def processFile(inputFile: os.Path, grid: Grid, runTargetDir: os.Path): NetCdf.Metadata = {
-    val gridOutputDir = runTargetDir / grid.outputPath
+  private def processFile(inputFile: os.Path, grid: Grid, zoneOutputDir: os.Path): NetCdf.Metadata = {
     val result = NetCdf.read(inputFile)
-    generateRasterImagesAndVectorTiles(gridOutputDir, result)
-    generateLocationForecasts(gridOutputDir, grid.outputPath, result)
+    generateRasterImagesAndVectorTiles(zoneOutputDir, result)
+    generateLocationForecasts(zoneOutputDir, grid.outputPath, result)
     result.metadata
   }
 

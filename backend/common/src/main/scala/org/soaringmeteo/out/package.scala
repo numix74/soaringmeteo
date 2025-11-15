@@ -42,4 +42,31 @@ package object out {
     }
   }
 
+  /**
+   * Create all necessary output directories for a model run.
+   *
+   * @param baseOutputDir Base output directory
+   * @param model Model name ("gfs", "wrf", "arome")
+   * @param initDateString Initialization date string
+   * @param zones List of zone identifiers
+   */
+  def createOutputDirectories(
+    baseOutputDir: os.Path,
+    model: String,
+    initDateString: String,
+    zones: Seq[String]
+  ): Unit = {
+    // Create run directory and forecast.json location
+    val runDir = OutputPaths.runOutputDir(baseOutputDir, model, initDateString)
+    os.makeDir.all(runDir)
+
+    // Create zone-specific directories
+    for (zone <- zones) {
+      val mapsDir = OutputPaths.mapsDir(baseOutputDir, model, initDateString, zone)
+      val locationDir = OutputPaths.locationDir(baseOutputDir, model, initDateString, zone)
+      os.makeDir.all(mapsDir)
+      os.makeDir.all(locationDir)
+    }
+  }
+
 }

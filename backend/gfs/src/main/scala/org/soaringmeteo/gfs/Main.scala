@@ -5,8 +5,8 @@ import com.monovore.decline.{CommandApp, Opts}
 import org.slf4j.LoggerFactory
 import org.soaringmeteo.InitDateString
 import org.soaringmeteo.PathArgument.pathArgument
-import org.soaringmeteo.gfs.out.{Store, runTargetPath, versionedTargetPath}
-import org.soaringmeteo.out.touchMarkerFile
+import org.soaringmeteo.gfs.out.Store
+import org.soaringmeteo.out.{OutputPaths, touchMarkerFile}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -58,11 +58,22 @@ object Soaringmeteo {
         }
         Await.result(Store.ensureSchemaExists(), 30.seconds)
         val forecastGribsDir = gfsRun.storagePath(gribsDir)
-        val versionedTargetDir = versionedTargetPath(outputDir)
-        val runTargetDir = runTargetPath(versionedTargetDir, InitDateString(gfsRun.initDateTime))
-        os.makeDir.all(runTargetDir)
-        DataPipeline(forecastGribsDir, runTargetDir, gfsRun, subgrids, reusePreviousGribFiles)
-        JsonWriter.writeJsons(versionedTargetDir, gfsRun)
+        val initDateString = InitDateString(gfsRun.initDateTime)
+
+        // Use harmonized output paths
+        val modelOutputDir = OutputPaths.modelOutputDir(outputDir, "gfs")
+        val runOutputDir = OutputPaths.runOutputDir(outputDir, "gfs", initDateString)
+
+        // Create all necessary directories
+        os.makeDir.all(runOutputDir)
+        subgrids.foreach { subgrid =>
+          val zoneOutputDir = OutputPaths.zoneOutputDir(outputDir, "gfs", initDateString, subgrid.id)
+          os.makeDir.all(zoneOutputDir / "maps")
+          os.makeDir.all(zoneOutputDir / "location")
+        }
+
+        DataPipeline(forecastGribsDir, runOutputDir, gfsRun, subgrids, reusePreviousGribFiles)
+        JsonWriter.writeJsons(modelOutputDir, gfsRun)
         touchMarkerFile(outputDir)
         logger.info("Done")
         0
