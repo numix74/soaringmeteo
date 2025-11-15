@@ -173,7 +173,7 @@ object Raster {
     Raster(
       "cape",
       doubleData { meteoData =>
-        meteoData.cape.fold(0.0)(_.toJoulesPerKilogram)
+        meteoData.cape.fold(0.0)(_.toGrays)
       },
       ColorMap(
         0    -> 0xf0f0ff,
