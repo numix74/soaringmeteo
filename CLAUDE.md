@@ -471,6 +471,44 @@ type State = {
 
 **Reactive Updates**: Map layers update automatically when state changes
 
+### Output Structure Harmonization (November 2025)
+
+**Purpose**: Unified output directory structure for all weather models.
+
+**Location**: All outputs now go to `/home/user/soaringmeteo/output/`
+
+**Structure**:
+```
+/home/user/soaringmeteo/output/
+└── <formatVersion>/              # Ex: "7"
+    ├── gfs/<initDate>/<zone>/
+    │   ├── maps/<hour>/
+    │   └── location/
+    ├── arome/<initDate>/<zone>/
+    │   ├── maps/<hour>/
+    │   └── location/
+    └── wrf/<initDate>/<zone>/
+        ├── maps/<hour>/
+        └── location/
+```
+
+**Key Helper**: `OutputPaths.scala` provides consistent path generation
+```scala
+OutputPaths.modelOutputDir(baseDir, "gfs")
+OutputPaths.runOutputDir(baseDir, "gfs", "2025-11-15T06")
+OutputPaths.zoneOutputDir(baseDir, "gfs", "2025-11-15T06", "pays-basque")
+OutputPaths.mapsDir(...)
+OutputPaths.locationDir(...)
+```
+
+**Benefits**:
+- Single output root for all models
+- Predictable URLs for frontend
+- Easy to add new models (ICON, ECMWF, etc.)
+- Consistent structure for backups/cleanup
+
+**See**: `docs/harmonisation-outputs.md` for complete implementation details
+
 ---
 
 ## Code Conventions
@@ -915,6 +953,44 @@ const Meteogram = lazy(() => import('./diagrams/Meteogram'));
 
 ---
 
+## Technical Documentation
+
+### Internal Architecture Docs
+
+**MeteoData Refactoring**:
+- **File**: `docs/technical/meteodata-refactoring.md`
+- **Content**: Complete documentation of the MeteoData trait architecture
+- **Topics**: Unified interface, adapters (GFS, AROME), Raster/VectorTiles refactoring
+- **Status**: ✅ Production-ready (October 2025)
+
+**AROME Winds Extraction**:
+- **File**: `docs/technical/arome-winds-extraction.md`
+- **Content**: Technical guide for multi-level wind data extraction from AROME GRIB2
+- **Topics**: HP1 file structure, wgrib2 extraction, interpolation, OOM resolution
+- **Status**: ✅ Production-ready (November 2025)
+
+**Output Structure Harmonization**:
+- **File**: `docs/harmonisation-outputs.md`
+- **Content**: Complete migration to unified output structure for all models
+- **Topics**: OutputPaths helpers, directory structure, migration plan
+- **Status**: ✅ Implemented (November 2025)
+
+### Operational Docs
+
+**AROME Pipeline Analysis**:
+- **File**: `docs/operational/arome-pipeline-analysis.md`
+- **Content**: Production pipeline analysis, troubleshooting, deployment
+- **Topics**: Missing scripts, cron configuration, data flow, next steps
+- **Status**: ⚠️ Action required (scripts missing)
+
+### Archive
+
+Older documentation has been moved to `docs/archive/` to reduce redundancy:
+- `REFACTOR_METEODATA.md` - Superseded by `technical/meteodata-refactoring.md`
+- `ARCHITECTURE_MVT.md` - Content split into `arome-winds-extraction.md` and others
+
+---
+
 ## External Resources
 
 ### Official Documentation
@@ -1044,7 +1120,8 @@ Tests:          backend/{module}/src/test/scala/
 ```scala
 // Backend
 MeteoData         // Unified weather data interface
-Forecast          // GFS forecast data
+Forecast          // GFS forecast data (also aliased as GfsData in gfs/ module)
+GfsData           // Type alias for Forecast (see gfs/package.scala)
 AromeData         // AROME model data
 Wind, Velocity    // Squants types
 OffsetDateTime    // Java time
@@ -1054,6 +1131,9 @@ State             // Global application state
 Layer             // Map visualization layer
 ForecastMetadata  // Forecast run metadata
 ```
+
+**Note**: `Forecast` and `GfsData` refer to the same type. `GfsData` is a type alias introduced
+for consistency with `AromeData` naming. Future versions will fully rename `Forecast` to `GfsData`.
 
 ---
 
