@@ -5,6 +5,7 @@ import { soaringLayerTopWindLayer, boundaryLayerWindLayer, surfaceWindLayer, _30
 import { xcFlyingPotentialLayer } from "./ThQ";
 import { Layer } from "./Layer";
 import { cumuliDepthLayer } from "./CumuliDepth";
+import { capeLayer } from "./Cape";
 
 const layersByKey: Map<string, Layer> =
   new Map(
@@ -14,6 +15,7 @@ const layersByKey: Map<string, Layer> =
       thermalVelocityLayer,
       cloudsRainLayer,
       cumuliDepthLayer,
+      capeLayer,
       surfaceWindLayer,
       _300MAGLWindLayer,
       _2000MAMSLWindLayer,

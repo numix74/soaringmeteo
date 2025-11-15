@@ -16,6 +16,7 @@ import {
 import {cloudsRainLayer} from './layers/CloudsRain';
 import {thermalVelocityLayer} from './layers/ThermalVelocity';
 import {cumuliDepthLayer} from './layers/CumuliDepth';
+import {capeLayer} from './layers/Cape';
 import {showDate} from './shared';
 import {Checkbox, Radio, Select} from './styles/Forms';
 import {burgerBorderTopStyle, burgerPaddingStyle} from "./styles/Styles";
@@ -170,6 +171,7 @@ export const LayersSelector = (props: {
 
   const cloudsRainEl = setupLayerBtn(cloudsRainLayer, 'primary-layer');
   const cumuliDepthEl = setupLayerBtn(cumuliDepthLayer, 'primary-layer');
+  const capeEl = setupLayerBtn(capeLayer, 'primary-layer');
 
   const primaryLayerEl =
     <fieldset style={ fieldsetPaddingStyle }>
@@ -186,6 +188,7 @@ export const LayersSelector = (props: {
       {thermalVelocityEl}
       {cloudsRainEl}
       {cumuliDepthEl}
+      {capeEl}
     </fieldset>;
 
   return <>
