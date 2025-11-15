@@ -5,8 +5,9 @@ import scala.concurrent.duration.Duration
 import org.slf4j.LoggerFactory
 import java.time.OffsetDateTime
 import os.Path
-import org.soaringmeteo.MeteoData
+import org.soaringmeteo.{InitDateString, MeteoData}
 import org.soaringmeteo.arome.out.Store
+import org.soaringmeteo.out.{JsonData, OutputPaths, touchMarkerFile}
 
 object Main {
   private val logger = LoggerFactory.getLogger(getClass)
@@ -26,9 +27,11 @@ object Main {
 
   def run(settings: Settings): Unit = {
     val initTime = OffsetDateTime.now()
+    val initDateString = InitDateString(initTime)
 
     logger.info("=== AROME Production Pipeline ===")
     logger.info(s"Initialization time: $initTime")
+    logger.info(s"Init date string: $initDateString")
     logger.info(s"Zones to process: ${settings.zones.map(_.name).mkString(", ")}")
 
     Await.result(Store.ensureSchemaExists(), Duration.Inf)
@@ -36,21 +39,39 @@ object Main {
     for (setting <- settings.zones) {
       logger.info(s"\nProcessing zone: ${setting.name}")
       val outputBaseDir = os.Path(setting.outputDirectory)
-      os.makeDir.all(outputBaseDir)
-      processZone(initTime, setting, outputBaseDir)
+
+      // Use harmonized output paths
+      processZone(initTime, initDateString, setting, outputBaseDir)
     }
 
     Store.close()
+    touchMarkerFile(outputBaseDir)
     logger.info("\n=== AROME Pipeline Complete ===")
   }
 
-  private def processZone(initTime: OffsetDateTime, setting: AromeSetting, outputBaseDir: os.Path): Unit = {
+  private def processZone(
+    initTime: OffsetDateTime,
+    initDateString: String,
+    setting: AromeSetting,
+    outputBaseDir: os.Path
+  ): Unit = {
     val gribDir = os.Path(setting.gribDirectory)
 
     if (!os.exists(gribDir)) {
       logger.warn(s"GRIB directory not found: $gribDir")
       return
     }
+
+    // Use harmonized output paths
+    val zoneId = setting.name.toLowerCase.replace(" ", "-")
+    val zoneOutputDir = OutputPaths.zoneOutputDir(outputBaseDir, "arome", initDateString, zoneId)
+    val mapsBaseDir = OutputPaths.mapsDir(outputBaseDir, "arome", initDateString, zoneId)
+    val locationDir = OutputPaths.locationDir(outputBaseDir, "arome", initDateString, zoneId)
+
+    // Create directories
+    os.makeDir.all(zoneOutputDir)
+    os.makeDir.all(mapsBaseDir)
+    os.makeDir.all(locationDir)
 
     // Définir les groupes de fichiers GRIB
     val groups = Seq(
@@ -111,20 +132,23 @@ object Main {
                 new AromeMeteoDataAdapter(aromeData, initTime.plusHours(hour))
               }
             }
-            val mapsDir = outputBaseDir / "maps" / f"${hour}%02d"
-            os.makeDir.all(mapsDir)
-            logger.debug(s"    Generating PNG...")
+
+            // Use harmonized hour directory path
+            val hourMapsDir = OutputPaths.hourMapsDir(outputBaseDir, "arome", initDateString, zoneId, hour)
+            os.makeDir.all(hourMapsDir)
+
+            logger.debug(s"    Generating PNG to $hourMapsDir...")
             org.soaringmeteo.out.Raster.writeAllPngFiles(
               setting.zone.longitudes.size,
               setting.zone.latitudes.size,
-              mapsDir,
+              zoneOutputDir,  // Base directory for zone
               hour,
               meteoData
             )
             logger.debug(s"    Generating MVT...")
             org.soaringmeteo.out.VectorTiles.writeAllVectorTiles(
               AromeVectorTilesParameters(setting.zone),
-              mapsDir,
+              zoneOutputDir,  // Base directory for zone
               hour,
               meteoData
             )
@@ -143,8 +167,13 @@ object Main {
         futures += future
       }
     }
- 
+
     Await.result(Future.sequence(futures), Duration.Inf)
+
+    // TODO: Generate location JSON files
+    logger.info(s"Generating location forecasts for zone ${setting.name}...")
+    // JsonData.writeForecastsByLocation(...) will be added next
+
     logger.info(s"Zone ${setting.name} completed")
   }
 }
