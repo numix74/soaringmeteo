@@ -65,6 +65,22 @@ object Store {
     db.run(action).map(_ == width * height)
   }
 
+  /**
+   * Retrieve all data for a specific location (x, y) across all hour offsets for a given init time and zone.
+   * Returns a Map of hourOffset -> AromeData.
+   */
+  def getDataForLocation(initTime: OffsetDateTime, zone: String, x: Int, y: Int): Future[Map[Int, AromeData]] = {
+    val action = aromeGrids
+      .filter(g => g.initTime === initTime && g.zone === zone && g.x === x && g.y === y)
+      .result
+    db.run(action).map { rows =>
+      rows.map { case (_, _, hourOffset, _, _, dataJson) =>
+        val data = parser.parse(dataJson).flatMap(decodeAromeData).toOption
+        hourOffset -> data
+      }.collect { case (hour, Some(data)) => hour -> data }.toMap
+    }
+  }
+
   private def encodeAromeData(data: AromeData): Json = {
     Json.obj(
       "t2m" -> Json.fromDoubleOrNull(data.t2m),
@@ -89,5 +105,30 @@ object Store {
         }.toSeq: _*
       )
     )
+  }
+
+  private def decodeAromeData(json: Json): Decoder.Result[AromeData] = {
+    val cursor = json.hcursor
+    for {
+      t2m <- cursor.get[Double]("t2m")
+      u10 <- cursor.get[Double]("u10")
+      v10 <- cursor.get[Double]("v10")
+      pblh <- cursor.get[Double]("pblh")
+      cape <- cursor.get[Double]("cape")
+      sensibleHeatFlux <- cursor.get[Double]("sensibleHeatFlux")
+      latentHeatFlux <- cursor.get[Double]("latentHeatFlux")
+      solarRadiation <- cursor.get[Double]("solarRadiation")
+      cloudCover <- cursor.get[Double]("cloudCover")
+      terrainElevation <- cursor.get[Double]("terrainElevation")
+      windsAtHeights <- cursor.get[Map[String, JsonObject]]("windsAtHeights").map { heightsMap =>
+        heightsMap.flatMap { case (heightStr, windObj) =>
+          for {
+            height <- heightStr.toIntOption
+            u <- windObj("u").flatMap(_.asNumber).flatMap(_.toDouble)
+            v <- windObj("v").flatMap(_.asNumber).flatMap(_.toDouble)
+          } yield height -> (u, v)
+        }
+      }
+    } yield AromeData(t2m, u10, v10, pblh, cape, sensibleHeatFlux, latentHeatFlux, solarRadiation, cloudCover, terrainElevation, windsAtHeights)
   }
 }

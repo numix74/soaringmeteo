@@ -137,20 +137,32 @@ def createOutputDirectories(
 
 **Fichiers modifiés** :
 - `backend/arome/src/main/scala/org/soaringmeteo/arome/Main.scala`
-  - Import de `OutputPaths`, `JsonData`, `InitDateString`, `touchMarkerFile`
+  - Import de `OutputPaths`, `JsonData`, `InitDateString`, `touchMarkerFile`, `ForecastMetadata`
   - Calcul de `initDateString` depuis `initTime`
   - Normalisation des noms de zones (ex: "Pays Basque" → "pays-basque")
   - Utilisation des nouveaux chemins harmonisés
   - Création automatique de tous les répertoires
-  - **TODO**: Génération de location JSON (marqué dans le code)
-  - **TODO**: Génération de forecast.json
+  - ✅ Génération de location JSON via `generateLocationForecasts()`
+  - ✅ Génération de forecast.json via `writeForecastMetadata()`
+
+**Fichiers créés** :
+- `backend/arome/src/main/scala/org/soaringmeteo/arome/out/AromeLocationJson.scala`
+  - Structure JSON simplifiée adaptée aux données AROME
+  - Clustering 4x4 comme GFS
+  - Champs: thermal velocity, boundary layer, wind10m, cloud cover, CAPE, t2m, winds at heights
+  - Format compatible pour méteogrammes (frontend devra être adapté)
+
+- `backend/arome/src/main/scala/org/soaringmeteo/arome/out/Store.scala`
+  - Ajout de `getDataForLocation()` pour récupérer toutes les heures d'un point (x,y)
+  - Ajout de `decodeAromeData()` pour désérialiser depuis JSON
 
 **Comportement** :
 - ✅ Utilise la nouvelle structure harmonisée
 - ✅ Versioning ajouté
 - ✅ initDateString ajouté
-- ⚠️ Location JSON non encore implémenté
-- ⚠️ forecast.json non encore implémenté
+- ✅ Location JSON implémenté (AromeLocationJson.scala)
+- ✅ forecast.json implémenté (writeForecastMetadata)
+- ⚠️ Structure JSON simplifiée vs GFS (AROME n'a pas les mêmes champs détaillés)
 
 ---
 
@@ -348,8 +360,8 @@ Les anciens chemins GFS continueront de fonctionner via les fonctions deprecated
 - [x] Migrer GFS vers nouveaux chemins
 - [x] Migrer WRF vers nouveaux chemins
 - [x] Migrer AROME vers nouveaux chemins (structure uniquement)
-- [ ] Ajouter génération location JSON pour AROME
-- [ ] Ajouter génération forecast.json pour AROME
+- [x] Ajouter génération location JSON pour AROME
+- [x] Ajouter génération forecast.json pour AROME
 - [ ] Mettre à jour frontend (vite.config.ts, Model.ts)
 - [ ] Mettre à jour configurations AROME
 - [ ] Mettre à jour NGINX

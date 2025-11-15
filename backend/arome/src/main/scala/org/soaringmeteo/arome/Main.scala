@@ -3,11 +3,12 @@ package org.soaringmeteo.arome
 import scala.concurrent.{ExecutionContext, Future, Await}
 import scala.concurrent.duration.Duration
 import org.slf4j.LoggerFactory
-import java.time.OffsetDateTime
+import java.time.{OffsetDateTime, Period}
 import os.Path
 import org.soaringmeteo.{InitDateString, MeteoData}
 import org.soaringmeteo.arome.out.Store
-import org.soaringmeteo.out.{JsonData, OutputPaths, touchMarkerFile}
+import org.soaringmeteo.out.{JsonData, OutputPaths, touchMarkerFile, ForecastMetadata}
+import geotrellis.vector.Extent
 
 object Main {
   private val logger = LoggerFactory.getLogger(getClass)
@@ -36,13 +37,18 @@ object Main {
 
     Await.result(Store.ensureSchemaExists(), Duration.Inf)
 
+    // Determine output directory (use first zone's output dir as base)
+    val outputBaseDir = os.Path(settings.zones.head.outputDirectory)
+
     for (setting <- settings.zones) {
       logger.info(s"\nProcessing zone: ${setting.name}")
-      val outputBaseDir = os.Path(setting.outputDirectory)
-
       // Use harmonized output paths
       processZone(initTime, initDateString, setting, outputBaseDir)
     }
+
+    // Generate forecast.json metadata
+    logger.info("\nGenerating forecast metadata...")
+    writeForecastMetadata(initTime, initDateString, settings, outputBaseDir)
 
     Store.close()
     touchMarkerFile(outputBaseDir)
@@ -170,10 +176,100 @@ object Main {
 
     Await.result(Future.sequence(futures), Duration.Inf)
 
-    // TODO: Generate location JSON files
+    // Generate location JSON files
     logger.info(s"Generating location forecasts for zone ${setting.name}...")
-    // JsonData.writeForecastsByLocation(...) will be added next
+    generateLocationForecasts(initTime, setting, zoneOutputDir)
 
     logger.info(s"Zone ${setting.name} completed")
+  }
+
+  private def generateLocationForecasts(
+    initTime: OffsetDateTime,
+    setting: AromeSetting,
+    zoneOutputDir: os.Path
+  ): Unit = {
+    val width = setting.zone.longitudes.size
+    val height = setting.zone.latitudes.size
+
+    org.soaringmeteo.arome.out.AromeLocationJson.writeForecastsByLocation(
+      zoneName = setting.name,
+      width = width,
+      height = height,
+      targetDir = zoneOutputDir
+    ) { (x, y) =>
+      // Retrieve all hours for this location from the database
+      val dataByHour = Await.result(
+        Store.getDataForLocation(initTime, setting.name, x, y),
+        Duration.Inf
+      )
+
+      // Convert to Map[hourOffset, (AromeData, OffsetDateTime)]
+      dataByHour.map { case (hourOffset, data) =>
+        hourOffset -> (data, initTime.plusHours(hourOffset))
+      }
+    }
+  }
+
+  /**
+   * Generate forecast.json metadata file for all zones.
+   * This file is consumed by the frontend to know what forecast data is available.
+   */
+  private def writeForecastMetadata(
+    initTime: OffsetDateTime,
+    initDateString: String,
+    settings: Settings,
+    outputBaseDir: os.Path
+  ): Unit = {
+    val modelOutputDir = OutputPaths.modelOutputDir(outputBaseDir, "arome")
+
+    // Create zone metadata for each AROME zone
+    val zones = settings.zones.map { setting =>
+      val zoneId = setting.name.toLowerCase.replace(" ", "-")
+      val zone = setting.zone
+
+      // Calculate extent from zone lat/lon
+      val minLon = zone.longitudes.head
+      val maxLon = zone.longitudes.last
+      val minLat = zone.latitudes.last
+      val maxLat = zone.latitudes.head
+
+      // Calculate resolution (spacing between points)
+      val resolution = if (zone.longitudes.size > 1) {
+        BigDecimal(zone.longitudes(1) - zone.longitudes(0))
+      } else {
+        BigDecimal(0.025) // default
+      }
+
+      // Buffer extent by half resolution (like GFS does)
+      val bufferedExtent = Extent(minLon, minLat, maxLon, maxLat)
+        .buffer((resolution / 2).doubleValue)
+
+      // Create vector tiles parameters
+      val vectorTilesParams = AromeVectorTilesParameters(zone)
+
+      ForecastMetadata.Zone(
+        id = zoneId,
+        label = setting.name,
+        raster = ForecastMetadata.Raster(
+          projection = "EPSG:4326", // WGS84
+          resolution = resolution,
+          extent = bufferedExtent
+        ),
+        vectorTiles = ForecastMetadata.VectorTiles(vectorTilesParams, tileSize = 512)
+      )
+    }
+
+    // Write forecast.json (similar to GFS)
+    ForecastMetadata.overwriteLatestForecastMetadata(
+      targetDir = modelOutputDir,
+      history = Period.ofDays(2), // Keep 2 days of history
+      initDateString = initDateString,
+      initDateTime = initTime,
+      maybeFirstTimeStep = None, // First timestep is same as init time for AROME
+      latestHourOffset = 24, // AROME provides 25 hours (0-24)
+      zones = zones
+    )
+
+    logger.info(s"Forecast metadata written to ${modelOutputDir / "forecast.json"}")
   }
 }
