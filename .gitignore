@@ -62,3 +62,4 @@ backend/gfs/~/soaringmeteo-data/gfs/output/7/gfs/forecast.json
 
 # Ignorer les répertoires temporaires
 tmp/
+backend/logs/
