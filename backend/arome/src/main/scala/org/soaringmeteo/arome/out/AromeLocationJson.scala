@@ -147,6 +147,18 @@ object AromeLocationJson {
       )
     }
 
+    // Encode vertical profiles (for sounding diagrams)
+    val profilesJson = data.airDataByAltitude.toSeq.sortBy(_._1).map { case (altitude, airData) =>
+      Json.obj(
+        "h" -> Json.fromInt(altitude),
+        "t" -> Json.fromBigDecimal(BigDecimal(airData.temperature - 273.15).setScale(1, BigDecimal.RoundingMode.HALF_UP)),  // K -> °C
+        "td" -> Json.fromBigDecimal(BigDecimal(airData.dewPoint - 273.15).setScale(1, BigDecimal.RoundingMode.HALF_UP)),
+        "u" -> Json.fromInt((airData.u * 3.6).round.toInt),  // m/s -> km/h
+        "v" -> Json.fromInt((airData.v * 3.6).round.toInt),
+        "c" -> Json.fromInt((airData.cloudCover * 100).round.toInt)  // fraction -> percent
+      )
+    }
+
     Json.obj(
       "t" -> Json.fromString(time.format(DateTimeFormatter.ISO_DATE_TIME)),
       "v" -> Json.fromInt(thermalVelocityDmPerSec),
@@ -158,10 +170,16 @@ object AromeLocationJson {
       "c" -> Json.fromInt((data.cloudCover * 100).round.toInt),
       "cape" -> Json.fromInt(data.cape.round.toInt),
       "t2m" -> Json.fromBigDecimal(BigDecimal(data.t2mCelsius).setScale(1, BigDecimal.RoundingMode.HALF_UP)),
+      "dt2m" -> Json.fromBigDecimal(BigDecimal(data.dewPoint2mCelsius).setScale(1, BigDecimal.RoundingMode.HALF_UP)),
+      "mslet" -> Json.fromInt(data.msletHPa.round.toInt),
+      "rain" -> Json.fromBigDecimal(BigDecimal(data.totalRain).setScale(1, BigDecimal.RoundingMode.HALF_UP)),
+      "snow" -> Json.fromBigDecimal(BigDecimal(data.snowDepth).setScale(2, BigDecimal.RoundingMode.HALF_UP)),
+      "iso0" -> data.isothermZero.fold(Json.Null)(z => Json.fromInt(z.round.toInt)),
       "shf" -> Json.fromInt(data.sensibleHeatFlux.round.toInt),
       "lhf" -> Json.fromInt(data.latentHeatFlux.round.toInt),
       "rad" -> Json.fromInt(data.solarRadiation.round.toInt),
-      "winds" -> Json.arr(windsJson: _*)
+      "winds" -> Json.arr(windsJson: _*),
+      "p" -> Json.arr(profilesJson: _*)  // 'p' for profiles, matching GFS format
     )
   }
 }
