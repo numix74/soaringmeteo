@@ -162,27 +162,27 @@ object Store {
       terrainElevation <- cursor.get[Double]("terrainElevation")
 
       windsAtHeights <- cursor.get[Map[String, JsonObject]]("windsAtHeights").map { heightsMap =>
-        heightsMap.flatMap { case (heightStr, windObj) =>
+        heightsMap.iterator.flatMap { case (heightStr, windObj) =>
           for {
             height <- heightStr.toIntOption
-            u <- windObj("u").flatMap(_.asNumber).flatMap(_.toDouble)
-            v <- windObj("v").flatMap(_.asNumber).flatMap(_.toDouble)
+            u <- windObj("u").flatMap(_.asNumber.flatMap(_.toDouble))
+            v <- windObj("v").flatMap(_.asNumber.flatMap(_.toDouble))
           } yield height -> (u, v)
-        }
-      }.orElse(Right(Map.empty))
+        }.toMap
+      }.orElse(Right(Map.empty[Int, (Double, Double)]))
 
       airDataByAltitude <- cursor.get[Map[String, JsonObject]]("airDataByAltitude").map { altitudesMap =>
-        altitudesMap.flatMap { case (altStr, airDataObj) =>
+        altitudesMap.iterator.flatMap { case (altStr, airDataObj) =>
           for {
             altitude <- altStr.toIntOption
-            u <- airDataObj("u").flatMap(_.asNumber).flatMap(_.toDouble)
-            v <- airDataObj("v").flatMap(_.asNumber).flatMap(_.toDouble)
-            t <- airDataObj("t").flatMap(_.asNumber).flatMap(_.toDouble)
-            td <- airDataObj("td").flatMap(_.asNumber).flatMap(_.toDouble)
-            c <- airDataObj("c").flatMap(_.asNumber).flatMap(_.toDouble)
+            u <- airDataObj("u").flatMap(_.asNumber.flatMap(_.toDouble))
+            v <- airDataObj("v").flatMap(_.asNumber.flatMap(_.toDouble))
+            t <- airDataObj("t").flatMap(_.asNumber.flatMap(_.toDouble))
+            td <- airDataObj("td").flatMap(_.asNumber.flatMap(_.toDouble))
+            c <- airDataObj("c").flatMap(_.asNumber.flatMap(_.toDouble))
           } yield altitude -> AromeAirData(u, v, t, td, c)
-        }
-      }.orElse(Right(Map.empty))
+        }.toMap
+      }.orElse(Right(Map.empty[Int, AromeAirData]))
 
     } yield AromeData(
       t2m, u10, v10,
