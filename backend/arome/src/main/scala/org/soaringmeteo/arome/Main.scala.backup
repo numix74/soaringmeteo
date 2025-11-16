@@ -1,117 +1,90 @@
 package org.soaringmeteo.arome
 
-import scala.concurrent.{ExecutionContext, Future, Await}
-import scala.concurrent.duration.Duration
 import org.slf4j.LoggerFactory
-import java.time.OffsetDateTime
-import os.Path
-import org.soaringmeteo.MeteoData
-import org.soaringmeteo.arome.out.Store
+import java.time.{ZonedDateTime, ZoneOffset}
+import scala.util.{Try, Success, Failure}
 
 object Main {
   private val logger = LoggerFactory.getLogger(getClass)
-  implicit val ec: ExecutionContext = ExecutionContext.global
 
   def main(args: Array[String]): Unit = {
-    try {
-      val settings = Settings.fromCommandLineArguments(args)
-      run(settings)
-      System.exit(0)
-    } catch {
-      case e: Exception =>
-        logger.error("AROME processing failed", e)
+    logger.info("🌪️  AROME Pipeline Started")
+    if (args.length < 2) {
+      println("Usage: arome <gribDir> <outputDir>")
+      System.exit(1)
+    }
+    val gribDir = os.Path(args(0))
+    val outputBaseDir = os.Path(args(1))
+    val dirName = gribDir.last
+    val runDate = dirName.substring(0, 8)
+    val runHour = dirName.substring(9, 11)
+    val year = runDate.substring(0, 4)
+    val month = runDate.substring(4, 6)
+    val day = runDate.substring(6, 8)
+    val initTime = ZonedDateTime.of(
+      year.toInt, month.toInt, day.toInt,
+      runHour.toInt, 0, 0, 0,
+      ZoneOffset.UTC
+    )
+    logger.info(s"Input GRIB: $gribDir")
+    logger.info(s"Output: $outputBaseDir")
+    logger.info(s"Run time: $initTime")
+    Try {
+      processAromeRun(gribDir, outputBaseDir, initTime)
+    } match {
+      case Success(_) =>
+        logger.info("✅ AROME Pipeline Complete")
+      case Failure(ex) =>
+        logger.error("❌ AROME Pipeline Failed", ex)
         System.exit(1)
     }
   }
 
-  def run(settings: Settings): Unit = {
-    val initTime = OffsetDateTime.now()
+
+  private def processAromeRun(
+    gribDir: os.Path,
+    outputBaseDir: os.Path,
+    initTime: ZonedDateTime
+  ): Unit = {
+    val zone = AromeZone.paysBasque
+    val windsDir = gribDir / "winds_extracted"
     
-    logger.info("=== AROME Production Pipeline ===")
-    logger.info(s"Initialization time: $initTime")
-    logger.info(s"Zones to process: ${settings.zones.map(_.name).mkString(", ")}")
-
-    Await.result(Store.ensureSchemaExists(), Duration.Inf)
-
-    for (setting <- settings.zones) {
-      logger.info(s"\nProcessing zone: ${setting.name}")
-      
-      val outputBaseDir = os.Path(setting.outputDirectory)
-      os.makeDir.all(outputBaseDir)
-
-      processZone(initTime, setting, outputBaseDir)
-    }
-
-    Store.close()
-    logger.info("\n=== AROME Pipeline Complete ===")
-  }
-
-  private def processZone(initTime: OffsetDateTime, setting: AromeSetting, outputBaseDir: os.Path): Unit = {
-    val gribDir = os.Path(setting.gribDirectory)
-    
-    if (!os.exists(gribDir)) {
-      logger.warn(s"GRIB directory not found: $gribDir")
-      return
-    }
-
-    val futures = scala.collection.mutable.ListBuffer[Future[Unit]]()
-
-    for (hourOffset <- 0 until 25) {
-      val future = Future {
-        try {
-          logger.info(s"  Processing hour $hourOffset...")
-          
+    logger.info("Processing AROME groups...")
+    val groups = Seq(
+      ("00H06H", 0 to 6),
+      ("07H12H", 7 to 12),
+      ("13H18H", 13 to 18),
+      ("19H24H", 19 to 24),
+      ("25H30H", 25 to 30),
+      ("31H36H", 31 to 36),
+      ("37H42H", 37 to 42)
+    )
+    groups.foreach { case (groupName, hours) =>
+      logger.info(s"Processing group $groupName...")
+      val sp1File = gribDir / s"SP1_${groupName}.grib2"
+      val sp2File = gribDir / s"SP2_${groupName}.grib2"
+      val sp3File = gribDir / s"SP3_${groupName}.grib2"
+      if (os.exists(sp1File) && os.exists(sp2File) && os.exists(sp3File)) {
+        hours.foreach { hour =>
+          val hourOffsetInGroup = hour - hours.head
+          logger.info(s"  Processing hour $hour (offset $hourOffsetInGroup in group)...")
           val data = AromeGrib.fromGroupFiles(
-            sp1File = gribDir / "sp1" / s"hour_$hourOffset.grib2",
-            sp2File = gribDir / "sp2" / s"hour_$hourOffset.grib2",
-            sp3File = gribDir / "sp3" / s"hour_$hourOffset.grib2",
-            windsDir = gribDir / "winds",
-            hourOffset = hourOffset,
-            zone = setting.zone
+            sp1File, sp2File, sp3File, windsDir,
+            hourOffsetInGroup,
+            zone
           )
-
-          val meteoData: IndexedSeq[IndexedSeq[MeteoData]] = data.map { row =>
-            row.map { aromeData =>
-              new AromeMeteoDataAdapter(aromeData, initTime.plusHours(hourOffset))
-            }
+          logger.info(s"    Grid: ${data.length}×${data.head.length} points")
+          val mapsDir = outputBaseDir / "maps"
+          Seq("thermals", "pblh", "wind", "cape").foreach { param =>
+            val outputFile = mapsDir / f"${param}_h${hour}%03d.png"
+            AromeMapGenerator.generateMap(data, zone, param, outputFile, hour)
           }
-
-          val mapsDir = outputBaseDir / "maps" / f"${hourOffset}%02d"
-          os.makeDir.all(mapsDir)
-
-          logger.debug(s"    Generating PNG...")
-          org.soaringmeteo.out.Raster.writeAllPngFiles(
-            setting.zone.longitudes.size,
-            setting.zone.latitudes.size,
-            mapsDir,
-            hourOffset,
-            meteoData
-          )
-
-          logger.debug(s"    Generating MVT...")
-          org.soaringmeteo.out.VectorTiles.writeAllVectorTiles(
-            AromeVectorTilesParameters(setting.zone),
-            mapsDir,
-            hourOffset,
-            meteoData
-          )
-
-          logger.debug(s"    Saving to database...")
-          Await.result(
-            Store.save(initTime, setting.name, hourOffset, data),
-            Duration.Inf
-          )
-
-          logger.info(s"  Hour $hourOffset completed")
-        } catch {
-          case e: Exception =>
-            logger.error(s"Error processing hour $hourOffset", e)
         }
+      } else {
+        logger.warn(s"Missing files for group $groupName (need SP1, SP2, SP3)")
       }
-      futures += future
     }
+    logger.info("All groups processed")
 
-    Await.result(Future.sequence(futures), Duration.Inf)
-    logger.info(s"Zone ${setting.name} completed")
   }
 }

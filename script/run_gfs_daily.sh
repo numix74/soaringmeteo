@@ -11,9 +11,9 @@ echo "=== GFS Run ${RUN_TIME}Z started at $(date) ==="
 
 cd ~/soaringmeteo/backend
 sbt -Dconfig.file=/home/ubuntu/soaringmeteo/backend/gfs/pyrenees.conf \
-  "gfs/run --gfs-run-init-time $RUN_TIME /mnt/soaringmeteo-data/gfs/gribs /mnt/soaringmeteo-data/gfs/output"
+  "gfs/run --gfs-run-init-time $RUN_TIME /home/ubuntu/soaringmeteo/output/grib/gfs /home/ubuntu/soaringmeteo/output"
 
 echo "=== Copying to nginx at $(date) ==="
-sudo cp -r /mnt/soaringmeteo-data/gfs/output/7/gfs/* /usr/share/nginx/html/v2/data/7/gfs/
+sudo cp -r /home/ubuntu/soaringmeteo/output/7/gfs/* /usr/share/nginx/html/v2/data/7/gfs/
 
 echo "=== GFS Run ${RUN_TIME}Z completed at $(date) ==="

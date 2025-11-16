@@ -14,7 +14,7 @@ PROJECT_DIR="/home/ubuntu/soaringmeteo"
 BACKEND_DIR="$PROJECT_DIR/backend"
 LOG_DIR="$BACKEND_DIR/logs"
 LOG_FILE="$LOG_DIR/arome_$(date +%Y%m%d_%H%M).log"
-DATA_DIR="/mnt/soaringmeteo-data/arome/grib/pays_basque"
+DATA_DIR="/home/ubuntu/soaringmeteo/output/grib/arome/pays_basque"
 BASE_URL="https://object.files.data.gouv.fr/meteofrance-pnt/pnt"
 
 # Créer le répertoire de logs
@@ -293,14 +293,19 @@ fi
 
 log "📊 Étape 3/3 : Vérification des sorties..."
 
-OUTPUT_DIR="/mnt/soaringmeteo-data/arome/output/pays_basque/maps"
+OUTPUT_DIR="/home/ubuntu/soaringmeteo/output"
 
 if [ -d "$OUTPUT_DIR" ]; then
     MAPS_COUNT=$(find "$OUTPUT_DIR" -type f -name "*.png" -o -name "*.mvt" 2>/dev/null | wc -l)
     log "   Cartes générées: $MAPS_COUNT fichiers"
 
-    HOURS_COUNT=$(find "$OUTPUT_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
-    log "   Heures de prévision: $HOURS_COUNT répertoires"
+    # Trouver le dernier run généré
+    LATEST_RUN=$(find "$OUTPUT_DIR/7/arome" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort -r | head -1)
+    if [ -n "$LATEST_RUN" ]; then
+        HOURS_COUNT=$(find "$LATEST_RUN" -mindepth 1 -type d 2>/dev/null | wc -l)
+        log "   Heures de prévision: $HOURS_COUNT répertoires"
+        log "   Dernier run: $(basename $LATEST_RUN)"
+    fi
 
     if [ $MAPS_COUNT -gt 0 ]; then
         log_success "Génération des cartes réussie"
