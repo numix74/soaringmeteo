@@ -48,9 +48,17 @@ object Interpolation {
     addY: (Y, Y) => Y,
     subtractY: (Y, Y) => Y
   )(implicit ordering: Ordering[X]): Y = {
+    // Handle edge cases: empty or single-element data
+    require(sortedKnownDataPoints.nonEmpty, "Cannot interpolate with no data points")
+
+    if (sortedKnownDataPoints.size == 1) {
+      // With only one data point, return its Y value regardless of X
+      return sortedKnownDataPoints.head._2
+    }
+
     @tailrec
     def loop(i: Int, j: Int): Y = {
-      assert(i < j)
+      assert(i < j, s"Invalid interpolation state: i=$i must be < j=$j")
       import Ordering.Implicits.infixOrderingOps
       val (x0, y0) = sortedKnownDataPoints(i)
       val (x1, y1) = sortedKnownDataPoints(j)
