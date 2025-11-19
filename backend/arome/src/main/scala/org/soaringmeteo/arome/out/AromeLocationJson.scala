@@ -4,15 +4,21 @@ import io.circe.Json
 import org.slf4j.LoggerFactory
 import org.soaringmeteo.arome.AromeData
 import org.soaringmeteo.util.WorkReporter
+import org.soaringmeteo.{AirData, ConvectiveClouds, DayForecast, DetailedForecast, LocationForecasts, Wind, Winds, XCFlyingPotential}
+import squants.energy.{Joules, SpecificEnergy}
+import squants.motion.{KilometersPerHour, MetersPerSecond, Pressure, Pascals}
+import squants.radio.{Irradiance, WattsPerSquareMeter}
+import squants.space.{Length, Meters, Millimeters}
+import squants.thermal.{Kelvin, Temperature}
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
+
+import scala.collection.SortedMap
 
 /**
  * Generates location-specific JSON files for AROME data.
  *
- * Unlike GFS which uses the full LocationForecasts structure, AROME has a simplified
- * data model with fewer fields. This generates clustered JSON files similar to GFS
- * but with AROME-specific structure.
+ * This module converts AROME data to the standard LocationForecasts format
+ * used by the frontend for meteograms and soundings.
  */
 object AromeLocationJson {
 
@@ -24,7 +30,7 @@ object AromeLocationJson {
    * @param zoneName Human-readable zone name for logging
    * @param width Grid width
    * @param height Grid height
-   * @param targetDir Base directory for zone outputs (location/ will be created inside)
+   * @param targetDir Base directory for zone outputs (locations/ will be created inside)
    * @param getData Function to retrieve AROME data for a given (x, y) coordinate
    *                Returns Map[hourOffset, (AromeData, time)]
    */
@@ -40,7 +46,7 @@ object AromeLocationJson {
     val size = width * height
     val reporter = new WorkReporter(size / (k * k), s"Writing AROME location forecasts for ${zoneName}", logger)
 
-    val locationDir = targetDir / "location"
+    val locationDir = targetDir / "locations"  // Changed from "location" to "locations" to match GFS
     os.makeDir.all(locationDir)
 
     for {
@@ -56,7 +62,8 @@ object AromeLocationJson {
 
       val json = Json.arr(forecastsCluster.map { forecastColumns =>
         Json.arr(forecastColumns.map { forecastsByHour =>
-          encodeLocationForecasts(forecastsByHour)
+          val locationForecasts = toLocationForecasts(forecastsByHour)
+          LocationForecasts.jsonEncoder(locationForecasts)
         }: _*)
       }: _*)
 
@@ -72,114 +79,159 @@ object AromeLocationJson {
   }
 
   /**
-   * Encode AROME location forecasts to JSON.
-   *
-   * Structure:
-   * {
-   *   "h": elevation (meters),
-   *   "d": [ // days
-   *     {
-   *       "h": [ // hours
-   *         {
-   *           "t": ISO timestamp,
-   *           "v": thermal velocity (dm/s),
-   *           "bl": boundary layer depth (m),
-   *           "w10": { "u": u-wind (km/h), "v": v-wind (km/h) },
-   *           "c": cloud cover (0-100),
-   *           "cape": CAPE (J/kg),
-   *           "t2m": temperature 2m (°C),
-   *           "winds": [ // winds at different heights
-   *             { "h": height (m AGL), "u": u-wind (km/h), "v": v-wind (km/h) }
-   *           ]
-   *         }
-   *       ]
-   *     }
-   *   ]
-   * }
+   * Convert AROME data to LocationForecasts structure.
+   * This ensures compatibility with the frontend's expected format.
    */
-  private def encodeLocationForecasts(forecastsByHour: Map[Int, (AromeData, OffsetDateTime)]): Json = {
+  private def toLocationForecasts(forecastsByHour: Map[Int, (AromeData, OffsetDateTime)]): LocationForecasts = {
     if (forecastsByHour.isEmpty) {
-      return Json.obj(
-        "h" -> Json.fromInt(0),
-        "d" -> Json.arr()
+      return LocationForecasts(
+        elevation = Meters(0),
+        dayForecasts = Seq.empty
       )
     }
 
     val sortedForecasts = forecastsByHour.toSeq.sortBy(_._1)
-    val elevation = sortedForecasts.head._2._1.terrainElevation
+    val elevation = Meters(sortedForecasts.head._2._1.terrainElevation)
 
-    // Group by day
-    val forecastsByDay = sortedForecasts
-      .groupBy { case (_, (_, time)) => time.toLocalDate }
-      .toSeq
-      .sortBy(_._1)
-
-    val dayForecastsJson = forecastsByDay.map { case (date, hourForecasts) =>
-      val hourForecastsJson = hourForecasts.sortBy(_._1).map { case (_, (data, time)) =>
-        encodeHourForecast(data, time)
-      }
-
-      Json.obj(
-        "h" -> Json.arr(hourForecastsJson: _*)
-      )
+    // Convert each AROME data point to a DetailedForecast
+    val detailedForecasts: Seq[DetailedForecast] = sortedForecasts.map { case (_, (data, time)) =>
+      toDetailedForecast(data, time, elevation)
     }
 
-    Json.obj(
-      "h" -> Json.fromInt(elevation.round.toInt),
-      "d" -> Json.arr(dayForecastsJson: _*)
+    // Group by day and compute thunderstorm risk
+    val dayForecasts =
+      detailedForecasts
+        .groupBy(_.time.toLocalDate)
+        .filter { case (_, forecasts) => forecasts.nonEmpty }
+        .toSeq
+        .sortBy(_._1)
+        .map { case (forecastDate, hourForecasts) =>
+          val sortedHourForecasts = hourForecasts.sortBy(_.time)
+
+          // Calculate thunderstorm risk (simplified version)
+          val thunderstormRisk =
+            if (sortedHourForecasts.sizeIs >= 3) {
+              LocationForecasts.thunderstormRisk(
+                sortedHourForecasts(0),
+                sortedHourForecasts(sortedHourForecasts.size / 2),
+                sortedHourForecasts.last
+              )
+            } else {
+              0
+            }
+
+          DayForecast(
+            forecastDate,
+            sortedHourForecasts,
+            thunderstormRisk
+          )
+        }
+
+    LocationForecasts(
+      elevation = elevation,
+      dayForecasts = dayForecasts
     )
   }
 
-  private def encodeHourForecast(data: AromeData, time: OffsetDateTime): Json = {
-    // Convert thermal velocity from m/s to dm/s (decimeters per second) to match GFS format
-    val thermalVelocityDmPerSec = (data.thermalVelocity * 10).round.toInt
+  /**
+   * Convert a single AROME data point to a DetailedForecast.
+   */
+  private def toDetailedForecast(
+    data: AromeData,
+    time: OffsetDateTime,
+    groundLevel: Length
+  ): DetailedForecast = {
 
-    // Convert winds from m/s to km/h
-    val u10Kmh = (data.u10 * 3.6).round.toInt
-    val v10Kmh = (data.v10 * 3.6).round.toInt
-
-    // Encode winds at heights
-    val windsJson = data.windsAtHeights.toSeq.sortBy(_._1).map { case (height, (u, v)) =>
-      Json.obj(
-        "h" -> Json.fromInt(height),
-        "u" -> Json.fromInt((u * 3.6).round.toInt),  // m/s -> km/h
-        "v" -> Json.fromInt((v * 3.6).round.toInt)
-      )
+    // Calculate XC flying potential
+    val thermalVelocity = MetersPerSecond(data.thermalVelocity)
+    val boundaryLayerDepth = Meters(data.pblh)
+    val boundaryLayerWind = data.keyWinds("500m_AGL") match {
+      case Some((u, v)) => Wind(MetersPerSecond(u), MetersPerSecond(v))
+      case None => Wind(MetersPerSecond(data.u10), MetersPerSecond(data.v10))
     }
 
-    // Encode vertical profiles (for sounding diagrams)
-    val profilesJson = data.airDataByAltitude.toSeq.sortBy(_._1).map { case (altitude, airData) =>
-      Json.obj(
-        "h" -> Json.fromInt(altitude),
-        "t" -> Json.fromBigDecimal(BigDecimal(airData.temperature - 273.15).setScale(1, BigDecimal.RoundingMode.HALF_UP)),  // K -> °C
-        "td" -> Json.fromBigDecimal(BigDecimal(airData.dewPoint - 273.15).setScale(1, BigDecimal.RoundingMode.HALF_UP)),
-        "u" -> Json.fromInt((airData.u * 3.6).round.toInt),  // m/s -> km/h
-        "v" -> Json.fromInt((airData.v * 3.6).round.toInt),
-        "c" -> Json.fromInt((airData.cloudCover * 100).round.toInt)  // fraction -> percent
-      )
-    }
+    val xcPotential = XCFlyingPotential(
+      thermalVelocity = thermalVelocity,
+      soaringLayerDepth = boundaryLayerDepth,
+      wind = boundaryLayerWind
+    )
 
-    Json.obj(
-      "t" -> Json.fromString(time.format(DateTimeFormatter.ISO_DATE_TIME)),
-      "v" -> Json.fromInt(thermalVelocityDmPerSec),
-      "bl" -> Json.fromInt(data.pblh.round.toInt),
-      "w10" -> Json.obj(
-        "u" -> Json.fromInt(u10Kmh),
-        "v" -> Json.fromInt(v10Kmh)
-      ),
-      "c" -> Json.fromInt((data.cloudCover * 100).round.toInt),
-      "cape" -> Json.fromInt(data.cape.round.toInt),
-      "t2m" -> Json.fromBigDecimal(BigDecimal(data.t2mCelsius).setScale(1, BigDecimal.RoundingMode.HALF_UP)),
-      "dt2m" -> Json.fromBigDecimal(BigDecimal(data.dewPoint2mCelsius).setScale(1, BigDecimal.RoundingMode.HALF_UP)),
-      "mslet" -> Json.fromInt(data.msletHPa.round.toInt),
-      "rain" -> Json.fromBigDecimal(BigDecimal(data.totalRain).setScale(1, BigDecimal.RoundingMode.HALF_UP)),
-      "snow" -> Json.fromBigDecimal(BigDecimal(data.snowDepth).setScale(2, BigDecimal.RoundingMode.HALF_UP)),
-      "iso0" -> data.isothermZero.fold(Json.Null)(z => Json.fromInt(z.round.toInt)),
-      "shf" -> Json.fromInt(data.sensibleHeatFlux.round.toInt),
-      "lhf" -> Json.fromInt(data.latentHeatFlux.round.toInt),
-      "rad" -> Json.fromInt(data.solarRadiation.round.toInt),
-      "winds" -> Json.arr(windsJson: _*),
-      "p" -> Json.arr(profilesJson: _*)  // 'p' for profiles, matching GFS format
+    // Convert vertical profile data
+    val airDataByAltitude: SortedMap[Length, AirData] = SortedMap.from(
+      data.airDataByAltitude.map { case (altitudeMeters, aromeAirData) =>
+        val altitude = Meters(altitudeMeters.toDouble)
+        val airData = AirData(
+          wind = Wind(MetersPerSecond(aromeAirData.u), MetersPerSecond(aromeAirData.v)),
+          temperature = Kelvin(aromeAirData.temperature),
+          dewPoint = Kelvin(aromeAirData.dewPoint),
+          cloudCover = (aromeAirData.cloudCover * 100).toInt
+        )
+        altitude -> airData
+      }
+    )
+
+    // Calculate convective clouds (if vertical profile exists)
+    val convectiveClouds: Option[ConvectiveClouds] =
+      if (airDataByAltitude.nonEmpty) {
+        ConvectiveClouds(
+          surfaceTemperature = Kelvin(data.t2m),
+          surfaceDewPoint = Kelvin(data.dewPoint2m),
+          groundLevel = groundLevel,
+          boundaryLayerDepth = boundaryLayerDepth,
+          airData = airDataByAltitude
+        )
+      } else {
+        None
+      }
+
+    // Create winds structure
+    val winds = Winds(
+      soaringLayerTop = data.keyWinds("500m_AGL") match {
+        case Some((u, v)) => Wind(MetersPerSecond(u), MetersPerSecond(v))
+        case None => Wind(MetersPerSecond(data.u10), MetersPerSecond(data.v10))
+      },
+      `300m AGL` = data.keyWinds("300m_AGL") match {
+        case Some((u, v)) => Wind(MetersPerSecond(u), MetersPerSecond(v))
+        case None => Wind(MetersPerSecond(data.u10), MetersPerSecond(data.v10))
+      },
+      `2000m AMSL` = data.keyWinds("2000m_AMSL") match {
+        case Some((u, v)) => Wind(MetersPerSecond(u), MetersPerSecond(v))
+        case None => Wind(MetersPerSecond(data.u10), MetersPerSecond(data.v10))
+      },
+      `3000m AMSL` = data.keyWinds("3000m_AMSL") match {
+        case Some((u, v)) => Wind(MetersPerSecond(u), MetersPerSecond(v))
+        case None => Wind(MetersPerSecond(data.u10), MetersPerSecond(data.v10))
+      },
+      `4000m AMSL` = data.keyWinds("4000m_AMSL") match {
+        case Some((u, v)) => Wind(MetersPerSecond(u), MetersPerSecond(v))
+        case None => Wind(MetersPerSecond(data.u10), MetersPerSecond(data.v10))
+      }
+    )
+
+    DetailedForecast(
+      time = time,
+      xcFlyingPotential = xcPotential,
+      boundaryLayerDepth = boundaryLayerDepth,
+      boundaryLayerWind = boundaryLayerWind,
+      thermalVelocity = thermalVelocity,
+      totalCloudCover = (data.cloudCover * 100).toInt,
+      convectiveCloudCover = 0,  // AROME doesn't provide this directly
+      convectiveClouds = convectiveClouds,
+      airDataByAltitude = airDataByAltitude,
+      mslet = Pascals(data.mslet),
+      snowDepth = Meters(data.snowDepth),
+      surfaceTemperature = Kelvin(data.t2m),
+      surfaceDewPoint = Kelvin(data.dewPoint2m),
+      surfaceWind = Wind(MetersPerSecond(data.u10), MetersPerSecond(data.v10)),
+      totalRain = Millimeters(data.totalRain),
+      convectiveRain = Millimeters(0),  // AROME doesn't provide this directly
+      latentHeatNetFlux = WattsPerSquareMeter(data.latentHeatFlux),
+      sensibleHeatNetFlux = WattsPerSquareMeter(data.sensibleHeatFlux),
+      cape = SpecificEnergy(data.cape).getOrElse(Joules(0)),
+      cin = Joules(0),  // AROME doesn't provide CIN
+      downwardShortWaveRadiationFlux = WattsPerSquareMeter(data.solarRadiation),
+      isothermZero = data.isothermZero.map(Meters(_)),
+      winds = winds
     )
   }
 }

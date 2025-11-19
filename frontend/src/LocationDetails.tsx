@@ -9,7 +9,7 @@ import { HelpButton } from "./help/HelpButton";
 import {buttonStyle, diagramsIndex, roundButtonStyle, surfaceOverMap} from "./styles/Styles";
 import { css } from "./css-hooks";
 import {useI18n} from "./i18n";
-import {gfsName} from "./data/Model";
+import {gfsName, aromeName} from "./data/Model";
 
 /**
  * Box showing the forecast details (summary, meteogram, or sounding) for the selected location.
@@ -178,15 +178,20 @@ const ForecastSummary = (props: {
     </>;
 };
 
-/** The model name and initialization time, and the selected location’s coordinates */
+/** The model name and initialization time, and the selected location's coordinates */
 const ModelAndLocationDetail = (props: {
   domain: Domain
   longitude: number
   latitude: number
 }): JSX.Element => {
+  const modelDisplayName =
+    props.domain.state.model.name === gfsName ? 'GFS' :
+    props.domain.state.model.name === aromeName ? 'AROME' :
+    'WRF';
+
   return <>
     <div>
-      { props.domain.state.model.name === gfsName ? 'GFS' : 'WRF' }
+      { modelDisplayName }
       { ` (init. ${showDate(props.domain.state.forecastMetadata.init, { timeZone: props.domain.timeZone(), showWeekDay: true })}).` }
     </div>
     { showCoordinates(props.longitude, props.latitude, props.domain.state.model.name) }
