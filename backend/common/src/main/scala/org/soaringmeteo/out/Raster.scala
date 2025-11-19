@@ -45,14 +45,21 @@ object Raster {
   ): Unit = {
     logger.debug(s"Generating images for hour offset n°${hourOffset}")
     for (raster <- gfsRasters) {
-      val fileName = s"${hourOffset}.png"
-      val path = targetDir / raster.path / fileName
-      logger.trace(s"Generating image ${path}")
-      os.write.over(
-        path,
-        raster.toPng(width, height, meteoData).bytes,
-        createFolders = true
-      )
+      try {
+        val fileName = s"${hourOffset}.png"
+        val path = targetDir / raster.path / fileName
+        logger.trace(s"Generating image ${path}")
+        os.write.over(
+          path,
+          raster.toPng(width, height, meteoData).bytes,
+          createFolders = true
+        )
+        logger.trace(s"Successfully generated ${path}")
+      } catch {
+        case e: Exception =>
+          logger.error(s"Failed to generate PNG for layer '${raster.path}' at hour offset ${hourOffset}", e)
+          // Continue with next raster instead of stopping the whole loop
+      }
     }
   }
 
