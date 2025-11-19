@@ -63,9 +63,13 @@ export const xcFlyingPotentialLayer: Layer = {
     };
 
     const dayOverview = (locationForecasts: LocationForecasts): JSX.Element => {
-      return locationForecasts
-          .dayForecasts[0] // HACK Assume WRF forecast is always for exactly one day
-          .forecasts.map((detailedForecast, i) => thqElement(detailedForecast, i !== 0));
+      // For WRF/AROME: show all forecasts for the current day
+      // Get the first day with forecasts
+      const firstDay = locationForecasts.dayForecasts[0];
+      if (!firstDay) {
+        return <span />;
+      }
+      return firstDay.forecasts.map((detailedForecast, i) => thqElement(detailedForecast, i !== 0));
     };
 
     const summarizer = summarizerFromLocationDetails(props, (detailedForecast, locationForecasts) => {
