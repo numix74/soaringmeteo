@@ -5,11 +5,11 @@ import org.slf4j.LoggerFactory
 import org.soaringmeteo.arome.AromeData
 import org.soaringmeteo.util.WorkReporter
 import org.soaringmeteo.{AirData, ConvectiveClouds, DayForecast, DetailedForecast, LocationForecasts, Wind, Winds, XCFlyingPotential}
-import squants.energy.{Joules, SpecificEnergy}
-import squants.motion.{KilometersPerHour, MetersPerSecond, Pressure, Pascals}
-import squants.radio.{Irradiance, WattsPerSquareMeter}
+import squants.energy.{Grays, SpecificEnergy}
+import squants.motion.{MetersPerSecond, Pascals}
+import squants.radio.WattsPerSquareMeter
 import squants.space.{Length, Meters, Millimeters}
-import squants.thermal.{Kelvin, Temperature}
+import squants.thermal.Kelvin
 import java.time.OffsetDateTime
 
 import scala.collection.SortedMap
@@ -227,8 +227,8 @@ object AromeLocationJson {
       convectiveRain = Millimeters(0),  // AROME doesn't provide this directly
       latentHeatNetFlux = WattsPerSquareMeter(data.latentHeatFlux),
       sensibleHeatNetFlux = WattsPerSquareMeter(data.sensibleHeatFlux),
-      cape = SpecificEnergy(data.cape).getOrElse(Joules(0)),
-      cin = Joules(0),  // AROME doesn't provide CIN
+      cape = SpecificEnergy(data.cape).getOrElse(Grays(0)),
+      cin = Grays(0),  // AROME doesn't provide CIN
       downwardShortWaveRadiationFlux = WattsPerSquareMeter(data.solarRadiation),
       isothermZero = data.isothermZero.map(Meters(_)),
       winds = winds
