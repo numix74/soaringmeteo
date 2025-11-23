@@ -102,6 +102,10 @@ object Main {
       val sp3File = gribDir / s"SP3_${groupName}.grib2"
       val windsDir = gribDir / "winds"
 
+      // HP files for vertical profiles (optional - used for meteograms and soundings)
+      val hp1File = gribDir / s"HP1_${groupName}.grib2"
+      val hp2File = gribDir / s"HP2_${groupName}.grib2"
+
       // Vérifier que tous les fichiers existent
       if (!os.exists(sp1File)) {
         logger.warn(s"Missing file: $sp1File")
@@ -129,6 +133,8 @@ object Main {
               sp2File = sp2File,
               sp3File = sp3File,
               windsDir = windsDir,
+              hp1File = if (os.exists(hp1File)) Some(hp1File) else None,
+              hp2File = if (os.exists(hp2File)) Some(hp2File) else None,
               hourOffset = hourOffsetInGroup,  // Offset DANS le fichier groupe
               zone = setting.zone
             )

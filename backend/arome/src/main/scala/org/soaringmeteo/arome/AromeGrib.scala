@@ -205,10 +205,10 @@ object AromeGrib {
 
   /**
    * Extract vertical profiles from HP1/HP2 files (if available).
-   * HP1 contains profiles on altitude levels (T, U, V, HU, Z, P, etc.)
-   * HP2 contains additional profiles (TD, Q, TKE, etc.)
+   * HP1 contains profiles on altitude levels (T, U, V, RH, etc.)
+   * HP2 contains additional profiles (DPT, etc.)
    *
-   * @return Map of altitude (m AMSL) -> AromeAirData
+   * @return Map of altitude (m AGL) -> AromeAirData
    */
   private def extractVerticalProfiles(
     hp1File: Option[os.Path],
@@ -217,8 +217,6 @@ object AromeGrib {
     hourOffset: Int
   ): Map[Int, AromeAirData] = {
 
-    // For now, return empty map if no HP files provided
-    // TODO: Implement HP1/HP2 extraction when files are available
     if (hp1File.isEmpty && hp2File.isEmpty) {
       return Map.empty
     }
@@ -226,46 +224,140 @@ object AromeGrib {
     try {
       val profilesBuilder = mutable.Map.empty[Int, AromeAirData]
 
-      // Extract from HP1 if available (temperature, winds, humidity on altitude levels)
-      hp1File.foreach { file =>
-        if (os.exists(file)) {
-          try {
-            Grib.bracket(file) { grib =>
-              // HP1 typically contains these variables on multiple height levels
-              // We'll try to extract T, U, V, HU for standard altitudes (500, 1000, 1500, 2000, 2500, 3000m)
-
-              val tempOpt = grib.Feature.maybe("Temperature_height_above_ground")
-              val uWindOpt = grib.Feature.maybe("u-component_of_wind_height_above_ground")
-              val vWindOpt = grib.Feature.maybe("v-component_of_wind_height_above_ground")
-              val humidityOpt = grib.Feature.maybe("Relative_humidity_height_above_ground")
-
-              // Note: Actual implementation would need to iterate through levels
-              // This is a simplified version that assumes data structure
-              logger.debug(s"HP1 file found: $file - vertical profile extraction not yet fully implemented")
-            }
-          } catch {
-            case e: Exception =>
-              logger.warn(s"Error reading HP1 file $file: ${e.getMessage}")
-          }
-        }
-      }
-
-      // Extract from HP2 if available (dewpoint, additional diagnostics)
+      // First pass: Extract dewpoint from HP2 if available
+      val dewPointByHeight = mutable.Map.empty[Int, Double]
       hp2File.foreach { file =>
         if (os.exists(file)) {
           try {
             Grib.bracket(file) { grib =>
-              val dewPointOpt = grib.Feature.maybe("Dewpoint_temperature_height_above_ground")
-              logger.debug(s"HP2 file found: $file - vertical profile extraction not yet fully implemented")
+              grib.Feature.maybe("Dewpoint_temperature_height_above_ground").foreach { dewPointFeature =>
+                val verticalAxis = dewPointFeature.grid.getCoordinateSystem.getVerticalAxis
+                if (verticalAxis != null) {
+                  val heights = (0 until verticalAxis.getSize.toInt).map(i => verticalAxis.getCoordValue(i))
+                  heights.zipWithIndex.foreach { case (heightMeters, zIndex) =>
+                    try {
+                      val Array(x, y) = dewPointFeature.grid.getCoordinateSystem.findXYindexFromLatLon(
+                        location.latitude.doubleValue,
+                        location.longitude.doubleValue,
+                        null
+                      )
+                      val data = dewPointFeature.grid.readDataSlice(hourOffset, zIndex, -1, -1)
+                      val shape = data.getShape
+                      if (y >= 0 && y < shape(0) && x >= 0 && x < shape(1)) {
+                        val value = data.asInstanceOf[ArrayFloat.D2].get(y, x).toDouble
+                        if (!value.isNaN && value > 0) {
+                          dewPointByHeight(heightMeters.toInt) = value
+                        }
+                      }
+                    } catch {
+                      case _: Exception => // Skip this height level
+                    }
+                  }
+                }
+              }
             }
           } catch {
             case e: Exception =>
-              logger.warn(s"Error reading HP2 file $file: ${e.getMessage}")
+              logger.debug(s"Could not read HP2 file $file: ${e.getMessage}")
           }
         }
       }
 
-      profilesBuilder.toMap
+      // Second pass: Extract T, U, V, RH from HP1
+      hp1File.foreach { file =>
+        if (os.exists(file)) {
+          try {
+            Grib.bracket(file) { grib =>
+              val tempOpt = grib.Feature.maybe("Temperature_height_above_ground")
+              val uWindOpt = grib.Feature.maybe("u-component_of_wind_height_above_ground")
+              val vWindOpt = grib.Feature.maybe("v-component_of_wind_height_above_ground")
+              val rhOpt = grib.Feature.maybe("Relative_humidity_height_above_ground")
+
+              // Use temperature feature to get height levels (all should have same levels)
+              tempOpt.foreach { tempFeature =>
+                val verticalAxis = tempFeature.grid.getCoordinateSystem.getVerticalAxis
+                if (verticalAxis != null) {
+                  val heights = (0 until verticalAxis.getSize.toInt).map(i => verticalAxis.getCoordValue(i))
+
+                  heights.zipWithIndex.foreach { case (heightMeters, zIndex) =>
+                    val heightInt = heightMeters.toInt
+                    // Only extract heights we're interested in (skip very low levels like 10m, 20m)
+                    if (heightInt >= 100 && heightInt <= 3000) {
+                      try {
+                        val Array(x, y) = tempFeature.grid.getCoordinateSystem.findXYindexFromLatLon(
+                          location.latitude.doubleValue,
+                          location.longitude.doubleValue,
+                          null
+                        )
+
+                        // Read temperature
+                        val tempData = tempFeature.grid.readDataSlice(hourOffset, zIndex, -1, -1)
+                        val tempShape = tempData.getShape
+                        if (y >= 0 && y < tempShape(0) && x >= 0 && x < tempShape(1)) {
+                          val temperature = tempData.asInstanceOf[ArrayFloat.D2].get(y, x).toDouble
+
+                          // Read U wind
+                          val uWind = uWindOpt.map { feat =>
+                            val data = feat.grid.readDataSlice(hourOffset, zIndex, -1, -1)
+                            data.asInstanceOf[ArrayFloat.D2].get(y, x).toDouble
+                          }.getOrElse(0.0)
+
+                          // Read V wind
+                          val vWind = vWindOpt.map { feat =>
+                            val data = feat.grid.readDataSlice(hourOffset, zIndex, -1, -1)
+                            data.asInstanceOf[ArrayFloat.D2].get(y, x).toDouble
+                          }.getOrElse(0.0)
+
+                          // Read relative humidity
+                          val rh = rhOpt.map { feat =>
+                            val data = feat.grid.readDataSlice(hourOffset, zIndex, -1, -1)
+                            data.asInstanceOf[ArrayFloat.D2].get(y, x).toDouble
+                          }.getOrElse(50.0) // Default to 50% if not available
+
+                          // Calculate dewpoint from T and RH if not available from HP2
+                          val dewPoint = dewPointByHeight.getOrElse(heightInt, {
+                            // Magnus formula: Td = T - ((100 - RH) / 5)
+                            // More accurate: Td = (243.04 * (ln(RH/100) + 17.625*T/(243.04+T))) / (17.625 - ln(RH/100) - 17.625*T/(243.04+T))
+                            val tempC = temperature - 273.15
+                            val rhPercent = math.min(100, math.max(0, rh))
+                            val a = 17.625
+                            val b = 243.04
+                            val gamma = math.log(rhPercent / 100.0) + (a * tempC) / (b + tempC)
+                            val tdC = (b * gamma) / (a - gamma)
+                            tdC + 273.15 // Convert back to Kelvin
+                          })
+
+                          if (!temperature.isNaN && temperature > 0) {
+                            profilesBuilder(heightInt) = AromeAirData(
+                              temperature = temperature,
+                              dewPoint = dewPoint,
+                              u = uWind,
+                              v = vWind,
+                              cloudCover = 0.0 // HP1 doesn't contain cloud cover per level
+                            )
+                          }
+                        }
+                      } catch {
+                        case e: Exception =>
+                          logger.trace(s"Error reading level $heightInt: ${e.getMessage}")
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          } catch {
+            case e: Exception =>
+              logger.debug(s"Could not read HP1 file $file: ${e.getMessage}")
+          }
+        }
+      }
+
+      val result = profilesBuilder.toMap
+      if (result.nonEmpty) {
+        logger.debug(s"Extracted ${result.size} vertical profile levels: ${result.keys.toSeq.sorted.mkString(", ")}m")
+      }
+      result
     } catch {
       case e: Exception =>
         logger.warn(s"Error extracting vertical profiles: ${e.getMessage}")
