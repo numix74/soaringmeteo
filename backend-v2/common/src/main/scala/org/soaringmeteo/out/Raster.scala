@@ -27,32 +27,37 @@ object Raster {
 
   /**
    * Write all PNG files for a given hour offset.
+   * Uses frontend-compatible structure: layer/hourOffset.png
    *
    * @param width Grid width
    * @param height Grid height
-   * @param targetDir Output directory (hour-specific)
+   * @param zoneDir Zone output directory (e.g., /output-unified/7/gfs/2025-12-28T00/pyrenees)
    * @param hourOffset Hour offset from initialization
    * @param unifiedData Grid of unified model data
    */
   def writeAllPngFiles(
     width: Int,
     height: Int,
-    targetDir: os.Path,
+    zoneDir: os.Path,
     hourOffset: Int,
     unifiedData: IndexedSeq[IndexedSeq[UnifiedModelData]]
   ): Unit = {
-    logger.info(s"Generating PNG rasters for hour $hourOffset in $targetDir")
-    os.makeDir.all(targetDir)
+    logger.info(s"Generating PNG rasters for hour $hourOffset")
 
     unifiedRasters.foreach { raster =>
-      val pngPath = targetDir / s"${raster.path}.png"
+      // Create layer directory if needed
+      val layerDir = zoneDir / raster.path
+      os.makeDir.all(layerDir)
+
+      // Write PNG with hourOffset as filename: thermal-velocity/6.png
+      val pngPath = layerDir / s"$hourOffset.png"
       try {
         val png = raster.toPng(width, height, unifiedData)
         os.write.over(pngPath, png.bytes)
-        logger.debug(s"  Generated ${raster.path}.png")
+        logger.debug(s"  Generated ${raster.path}/$hourOffset.png")
       } catch {
         case e: Exception =>
-          logger.error(s"  Failed to generate ${raster.path}.png", e)
+          logger.error(s"  Failed to generate ${raster.path}/$hourOffset.png", e)
       }
     }
   }
@@ -159,6 +164,37 @@ object Raster {
       RgbaEncoding
     ),
     Raster(
+      "cumulus-depth",
+      intData { d =>
+        d.convectiveClouds.fold(0) { clouds =>
+          (clouds.top.toMeters - clouds.bottom.toMeters).round.toInt
+        }
+      },
+      ColorMap(
+        50   -> 0xffffff00,
+        400  -> 0xffffff7f,
+        800  -> 0xffffffff,
+        1500 -> 0xffff00ff,
+        3000 -> 0xff0000ff
+      ).withFallbackColor(0xff0000ff),
+      RgbaEncoding
+    ),
+    Raster(
+      "cape",
+      doubleData { d =>
+        d.cape.fold(0.0)(_.toGrays)
+      },
+      ColorMap(
+        0    -> 0xf0f0ff,
+        500  -> 0x96c8ff,
+        1000 -> 0x64ff96,
+        1500 -> 0xffff64,
+        2000 -> 0xff9632,
+        3000 -> 0xc83232
+      ).withFallbackColor(0xc83232),
+      RgbEncoding
+    ),
+    Raster(
       "temperature-2m",
       doubleData(d => d.surfaceTemperature.toCelsiusScale),
       ColorMap(
@@ -199,7 +235,18 @@ object Raster {
     override val path: String = pathValue
 
     override def toPng(width: Int, height: Int, unifiedData: IndexedSeq[IndexedSeq[UnifiedModelData]]): Png = {
-      val arrayData = unifiedData.flatten.map(dataExtractor.extract)
+      // Fix: Parcourir en row-major (y puis x) comme v1 pour ordre correct dans IntArrayTile
+      // unifiedData est IndexedSeq[IndexedSeq[UnifiedModelData]] où:
+      //   - index externe = longitude (x)
+      //   - index interne = latitude (y)
+      // IntArrayTile attend les pixels en row-major: ligne par ligne, de gauche à droite
+      val arrayData =
+        for {
+          y <- 0 until height    // Latitude (ligne) d'abord
+          x <- 0 until width     // Longitude (colonne) ensuite
+        } yield {
+          dataExtractor.extract(unifiedData(x)(y))
+        }
       val tile = dataExtractor.makeTile(arrayData, width, height)
       pngEncoding.encode(tile, colorMap)
     }

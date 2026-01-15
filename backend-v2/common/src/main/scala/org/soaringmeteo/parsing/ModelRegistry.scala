@@ -30,7 +30,12 @@ object ModelRegistry {
 
     // Cloud cover (required)
     totalCloudCover: String,
-    convectiveCloudCover: String,
+    convectiveCloudCover: Option[String],  // Optional: not all models provide it
+
+    // Cloud cover by layer (optional - AROME specific)
+    lowCloudCover: Option[String],
+    mediumCloudCover: Option[String],
+    highCloudCover: Option[String],
 
     // Precipitation (required)
     totalPrecipRate: String,
@@ -110,7 +115,12 @@ object ModelRegistry {
 
       // Clouds
       totalCloudCover = "Total_cloud_cover_entire_atmosphere_3_Hour_Average", // or 6_Hour_Average
-      convectiveCloudCover = "Total_cloud_cover_convective_cloud",
+      convectiveCloudCover = Some("Total_cloud_cover_convective_cloud"),
+
+      // Cloud layers (GFS doesn't provide these)
+      lowCloudCover = None,
+      mediumCloudCover = None,
+      highCloudCover = None,
 
       // Precipitation
       totalPrecipRate = "Precipitation_rate_surface",
@@ -148,54 +158,59 @@ object ModelRegistry {
     name = "AROME France (Météo-France)",
     format = FileFormat.GRIB2,
     variables = VariableMapping(
-      // Surface - AROME uses shorter names
-      temperature2m = "2 metre temperature",
-      dewPoint2m = "2 metre dewpoint temperature",
+      // Surface - AROME uses underscore-separated names
+      temperature2m = "Temperature_height_above_ground",
+      dewPoint2m = "Dewpoint_temperature_height_above_ground",
       relativeHumidity2m = None,  // AROME has direct dew point
-      uWind10m = "10 metre U wind component",
-      vWind10m = "10 metre V wind component",
-      pressure = "Mean sea level pressure",
-      snowDepth = Some("Snow depth"),
+      uWind10m = "u-component_of_wind_height_above_ground",
+      vWind10m = "v-component_of_wind_height_above_ground",
+      pressure = "Pressure_reduced_to_MSL_msl",
+      snowDepth = None,  // Check if available
 
       // Boundary layer
-      pblHeight = "Planetary boundary layer height",
+      pblHeight = "Planetary_boundary_layer_height_surface",
 
-      // Fluxes
-      sensibleHeatFlux = "Surface sensible heat flux",
-      latentHeatFlux = "Surface latent heat flux",
-      solarRadiation = "Surface net solar radiation",
+      // Fluxes (accumulated variables)
+      sensibleHeatFlux = "Sensible_heat_net_flux_surface_Mixed_intervals_Accumulation",
+      latentHeatFlux = "Latent_heat_net_flux_surface_Mixed_intervals_Accumulation",
+      solarRadiation = "Net_short_wave_radiation_flux_surface_Mixed_intervals_Accumulation",
 
-      // Clouds
-      totalCloudCover = "Total cloud cover",
-      convectiveCloudCover = "Convective cloud cover",  // May not exist in AROME
+      // Clouds (AROME provides detailed layer-by-layer coverage)
+      totalCloudCover = "Total_cloud_cover_surface",           // SP1: TCDC
+      convectiveCloudCover = None,                             // Not available in AROME
 
-      // Precipitation
-      totalPrecipRate = "Total precipitation",
-      convectivePrecipRate = "Convective precipitation",
+      // Cloud layers (AROME specific - SP2 file)
+      lowCloudCover = Some("Low_cloud_cover_surface"),         // SP2: LCDC (0-2km)
+      mediumCloudCover = Some("Medium_cloud_cover"),           // SP2: MCDC (2-5km)
+      highCloudCover = Some("High_cloud_cover"),               // SP2: HCDC (>5km)
+
+      // Precipitation (accumulated)
+      totalPrecipRate = "Total_precipitation_rate_surface_Mixed_intervals_Accumulation",
+      convectivePrecipRate = "Convective_precipitation_surface_Mixed_intervals_Accumulation",
 
       // Stability
-      cape = Some("Convective available potential energy"),
-      cin = Some("Convective inhibition"),
+      cape = Some("Convective_available_potential_energy_surface_layer"),
+      cin = Some("Convective_inhibition_surface"),
 
       // Geopotential
-      geopotentialSurface = "Geopotential",
-      geopotentialZeroDegC = "Geopotential height 0C isotherm",
+      geopotentialSurface = "Geometric_height_surface",
+      geopotentialZeroDegC = "Geopotential_height_zeroDegC_isotherm",
 
       // Boundary layer wind - may use surface or specific level
-      uWindPBL = "U component of wind",
-      vWindPBL = "V component of wind",
+      uWindPBL = "u-component_of_wind",
+      vWindPBL = "v-component_of_wind",
 
       // Isobaric - AROME may use height levels instead
       temperatureIsobaric = "Temperature",
-      relativeHumidityIsobaric = "Relative humidity",
-      uWindIsobaric = "U component of wind",
-      vWindIsobaric = "V component of wind",
-      geopotentialIsobaric = "Geopotential height",
-      cloudCoverIsobaric = "Total cloud cover"
+      relativeHumidityIsobaric = "Relative_humidity",
+      uWindIsobaric = "u-component_of_wind",
+      vWindIsobaric = "v-component_of_wind",
+      geopotentialIsobaric = "Geopotential_height",
+      cloudCoverIsobaric = "Total_cloud_cover"
     ),
     fileStructure = FileStructure.Grouped,
     nativeTimeStep = 1,
-    maxHourOffset = 24,  // AROME provides 24h forecasts (00H-24H in 4 groups)
+    maxHourOffset = 24,  // AROME provides 25h forecasts (H+0 to H+24)
     pressureLevels = Seq.empty  // AROME uses height levels (250m, 500m, ..., 3000m)
   )
 
@@ -224,7 +239,12 @@ object ModelRegistry {
 
       // Clouds
       totalCloudCover = "CLDFRA",
-      convectiveCloudCover = "CLDFRA",  // WRF doesn't separate convective
+      convectiveCloudCover = None,  // WRF doesn't separate convective
+
+      // Cloud layers (WRF doesn't provide these separately)
+      lowCloudCover = None,
+      mediumCloudCover = None,
+      highCloudCover = None,
 
       // Precipitation
       totalPrecipRate = "RAINNC",
